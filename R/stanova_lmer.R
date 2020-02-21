@@ -49,6 +49,7 @@ stanova_glmer <- function(
   call["check_contrasts"] <- NULL
 
   call[[1]] <- rstanarm::stan_glmer
+  call[["data"]] <- data
   mout <- eval(call)
   mout$call <- call
   mout$stan_function <- "stanova_glmer"
