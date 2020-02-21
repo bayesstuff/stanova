@@ -3,3 +3,4 @@
 S3method(summary,stanova)
 export(contr.bayes)
 export(stanova_lmer)
+export(stanova_samples)
