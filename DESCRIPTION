@@ -19,4 +19,9 @@ Imports:
     emmeans,
     lme4,
     coda,
-    rstan
+    rstan,
+    stats
+Suggests: 
+    testthat (>= 2.1.0),
+    MEMSS,
+    afex
