@@ -49,4 +49,15 @@ m2 <- stanova_lmer(value ~ treatment * phase + (1|id), obk.long,
 
 m2
 summary(m2)
+
+
+### glmer models
+
+cbpp <- lme4::cbpp
+cbpp$prob <- with(cbpp, incidence / size)
+example_model <- stanova_glmer(prob ~ period + (1|herd),
+                            data = cbpp, family = binomial,
+                            weight = size,
+                            chains = 2, cores = 1, seed = 12345, iter = 500)
+summary(example_model)
 }
