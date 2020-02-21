@@ -17,6 +17,7 @@ use_package("stats")
 
 use_package("MEMSS", type = "Suggests")
 use_package("afex", type = "Suggests")
+use_package("glmmTMB", type = "Suggests")
 
 library(usethis)
 

@@ -53,6 +53,7 @@ summary(m2)
 
 ### glmer models
 
+## binomial model
 cbpp <- lme4::cbpp
 cbpp$prob <- with(cbpp, incidence / size)
 example_model <- stanova_glmer(prob ~ period + (1|herd),
@@ -60,4 +61,11 @@ example_model <- stanova_glmer(prob ~ period + (1|herd),
                             weight = size,
                             chains = 2, cores = 1, seed = 12345, iter = 500)
 summary(example_model)
+
+## poisson model
+data(Salamanders, package = "glmmTMB")
+gm1 <- stanova_glmer(count~spp * mined + (1 | site), data = Salamanders,
+                   family = "poisson",
+                   chains = 2, cores = 1, seed = 12345, iter = 500)
+summary(gm1)
 }
