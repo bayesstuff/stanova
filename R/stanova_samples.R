@@ -28,61 +28,55 @@ stanova_samples <- function(object,
   term2 <- strsplit(terms_chr, split = ":")
   names(term2) <- terms_chr
 
+  ### extract samples as arrays
+  post_intercept <- as.array(object, pars = "(Intercept)")
+  post_intercept <- aperm(post_intercept, perm = c(1, 3, 2))
+  names(dimnames(post_intercept)) <- c("Iteration", "Parameter", "Chain")
 
-  if (return %in% c("array", "data.frame")) {
-    ### extract samples as arrays
-    post_intercept <- as.array(object, pars = "(Intercept)")
-    post_intercept <- aperm(post_intercept, perm = c(1, 3, 2))
-    names(dimnames(post_intercept)) <- c("Iteration", "Parameter", "Chain")
-
-    post_diff <- lapply(term2, function(x) {
-      ## extract samples per factor-level or design cell and concatenate chains
-      tmp <- coda::as.mcmc(emmeans::emmeans(object, x))
-      ## in case we only have one chain, we need to transform to mcmc.list first
-      ## before transforming into array
-      if (!coda::is.mcmc.list(tmp)) {
-        tmp <- coda::as.mcmc.list(tmp)
-      }
-      tmp <- as.array(tmp, drop = FALSE)
-      for (j in seq_len(dim(tmp)[2])) {
-        tmp[ ,j, ] <- tmp[ ,j, ] -
-          post_intercept[, 1, ]
-      }
-      dimnames(tmp)[[3]] <- dimnames(post_intercept)[[3]]
-      names(dimnames(tmp)) <- names(dimnames(post_intercept))
-      if (dimension_chain == 2L) {
-        tmp <- aperm(tmp, c(1, 3, 2))
-      }
-      if (dimension_chain == 1L) {
-        tmp <- aperm(tmp, c(3, 1, 2))
-      }
-      tmp
-    })
-    dimnames(post_intercept)[[1]] <- dimnames(post_diff[[1]])[[1]]
-    if (dimension_chain == 2L) {
-      post_intercept <- aperm(post_intercept, c(1, 3, 2))
-    }
-    if (dimension_chain == 1L) {
-      post_intercept <- aperm(post_intercept, c(3, 1, 2))
-    }
-
-  } else if (return == "matrix") {
-    ### extract samples as matrices
-
-    ## extract intercept and concatenate chains
-    post_intercept <- as.matrix(object, pars = "(Intercept)")
-
-    post_diff <- lapply(term2, function(x) {
-      ## extract samples per factor-level or design cell and concatenate chains
-      tmp <- as.matrix(coda::as.mcmc(emmeans::emmeans(object, x)))
-      ## calculate difference from intercept
-      tmp - post_intercept[,1]
-    })
+  post_diff <- lapply(term2, get_stanova_samples,
+                      object = object,
+                      intercept_array = post_intercept,
+                      dimension_chain = dimension_chain)
+  dimnames(post_intercept)[[1]] <- dimnames(post_diff[[1]])[[1]]
+  dims <- c("iter" = 1, "par" = 2, "chain" = 3)
+  if (dimension_chain == 2L) {
+    post_intercept <- aperm(post_intercept, c(1, 3, 2))
+    dims <- c("iter" = 1, "par" = 3, "chain" = 2)
+  }
+  if (dimension_chain == 1L) {
+    post_intercept <- aperm(post_intercept, c(3, 1, 2))
+    dims <- c("iter" = 2, "par" = 3, "chain" = 1)
   }
   out <- c(
     `(Intercept)` = list(post_intercept),
     post_diff
   )
+
+  if (return == "matrix") {
+    for (i in seq_along(out)) {
+      tmp_arr <- aperm(out[[i]],
+                       c(dims["iter"],dims["chain"],dims["par"]))
+      dim(tmp_arr) <- c(
+        dim(out[[i]])[dims["iter"]] * dim(out[[i]])[dims["chain"]],
+        dim(out[[i]])[dims["par"]]
+      )
+      colnames(tmp_arr) <- dimnames(out[[i]])[["Parameter"]]
+      out[[i]] <- tmp_arr
+    }
+
+    # ### extract samples as matrices
+    #
+    # ## extract intercept and concatenate chains
+    # post_intercept <- as.matrix(object, pars = "(Intercept)")
+    #
+    # post_diff <- lapply(term2, function(x) {
+    #   ## extract samples per factor-level or design cell and concatenate chains
+    #   tmp <- as.matrix(coda::as.mcmc(emmeans::emmeans(object, x)))
+    #   ## calculate difference from intercept
+    #   tmp - post_intercept[,1]
+    # })
+  }
+
   if (return == "data.frame") {
     for (i in seq_along(out)) {
       out[[i]] <- as.data.frame.table(out[[i]], responseName = "Value")
@@ -92,3 +86,32 @@ stanova_samples <- function(object,
   return(out)
 }
 
+get_stanova_samples <- function(term, object, intercept_array,
+                                dimension_chain) {
+  if (any(vapply(object[["data"]][,term], is.numeric, TRUE))) {
+    stop("not yet implemented ):")
+    tmp <- coda::as.mcmc(emmeans::emmeans(object, term))
+  } else {
+      ## extract samples per factor-level or design cell and concatenate chains
+      tmp <- coda::as.mcmc(emmeans::emmeans(object, term))
+      ## in case we only have one chain, we need to transform to mcmc.list first
+      ## before transforming into array
+      if (!coda::is.mcmc.list(tmp)) {
+        tmp <- coda::as.mcmc.list(tmp)
+      }
+      tmp <- as.array(tmp, drop = FALSE)
+      for (j in seq_len(dim(tmp)[2])) {
+        tmp[ ,j, ] <- tmp[ ,j, ] -
+          intercept_array[, 1, ]
+      }
+      dimnames(tmp)[[3]] <- dimnames(intercept_array)[[3]]
+      names(dimnames(tmp)) <- names(dimnames(intercept_array))
+      if (dimension_chain == 2L) {
+        tmp <- aperm(tmp, c(1, 3, 2))
+      }
+      if (dimension_chain == 1L) {
+        tmp <- aperm(tmp, c(3, 1, 2))
+      }
+      tmp
+  }
+}
