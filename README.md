@@ -98,16 +98,14 @@ summary(m_machines)
 #> 
 #> Estimate Intercept:
 #>      Variable Mean MAD_SD   5%  50%  95% rhat ess_bulk ess_tail
-#> 1 (Intercept) 59.6   1.85 56.4 59.5 63.2    1      175      270
+#> 1 (Intercept) 59.3    1.9 56.3 59.5 62.2    1      159      271
 #> 
 #> 
-#> Estimates 'Machine':
-#>    Variable  Mean MAD_SD    5%    50%   95% rhat ess_bulk ess_tail
-#> 1 Machine A -7.47   1.24 -9.76 -7.415 -5.52 1.01      216      259
-#> 2 Machine B  0.79   1.28 -1.25  0.637  3.07 1.00      170      242
-#> 3 Machine C  6.68   1.18  4.62  6.636  8.94 1.00      216      220
-#> 
-#> Note: Estimates of factor-levels represent differences from Intercept.
+#> Estimates 'Machine' - difference from intercept:
+#>    Variable   Mean MAD_SD    5%    50%   95% rhat ess_bulk ess_tail
+#> 1 Machine A -7.314   1.20 -9.48 -7.285 -5.46 1.00      255      228
+#> 2 Machine B  0.646   1.25 -1.47  0.667  2.86 1.01      162      207
+#> 3 Machine C  6.668   1.21  4.57  6.693  8.71 1.01      224      267
 ```
 
 If one is not interested in the differences from the factor levels, it
@@ -130,16 +128,14 @@ summary(m_machines, diff_intercept = FALSE)
 #> 
 #> Estimate Intercept:
 #>      Variable Mean MAD_SD   5%  50%  95% rhat ess_bulk ess_tail
-#> 1 (Intercept) 59.6   1.85 56.4 59.5 63.2    1      175      270
+#> 1 (Intercept) 59.3    1.9 56.3 59.5 62.2    1      159      271
 #> 
 #> 
-#> Estimates 'Machine':
+#> Estimates 'Machine' - marginal means:
 #>    Variable Mean MAD_SD   5%  50%  95%  rhat ess_bulk ess_tail
-#> 1 Machine A 52.1   1.76 48.8 52.1 55.1 0.999      194      284
-#> 2 Machine B 60.4   2.94 55.8 60.1 65.7 1.004      169      229
-#> 3 Machine C 66.3   1.85 63.0 66.2 69.7 1.033      202      235
-#> 
-#> Note: Estimates of factor-levels represent marginal means.
+#> 1 Machine A   52   1.71 49.0 52.1 55.1 1.003      212      314
+#> 2 Machine B   60   2.97 55.6 60.2 64.1 1.003      144      191
+#> 3 Machine C   66   1.73 62.6 66.0 69.3 0.997      201      272
 ```
 
 The key to the output is the `stanova_samples()` function which takes a
@@ -153,16 +149,17 @@ the `return` argument.
 out_array <- stanova_samples(m_machines)
 str(out_array)
 #> List of 2
-#>  $ (Intercept): num [1:250, 1, 1:2] 63.8 63.9 56.2 58.3 57.7 ...
+#>  $ (Intercept): num [1:250, 1, 1:2] 57.7 59.9 60.6 61.2 59.6 ...
 #>   ..- attr(*, "dimnames")=List of 3
 #>   .. ..$ Iteration: chr [1:250] "1" "2" "3" "4" ...
 #>   .. ..$ Parameter: chr "(Intercept)"
 #>   .. ..$ Chain    : chr [1:2] "chain:1" "chain:2"
-#>  $ Machine    : num [1:250, 1:3, 1:2] -7.69 -7.46 -6.53 -9.38 -8.55 ...
+#>  $ Machine    : num [1:250, 1:3, 1:2] -6.38 -8.17 -7.86 -8.12 -7.63 ...
 #>   ..- attr(*, "dimnames")=List of 3
 #>   .. ..$ Iteration: chr [1:250] "1" "2" "3" "4" ...
 #>   .. ..$ Parameter: chr [1:3] "Machine A" "Machine B" "Machine C"
 #>   .. ..$ Chain    : chr [1:2] "chain:1" "chain:2"
+#>   ..- attr(*, "estimate")= chr "difference from intercept"
 ```
 
 One can also change which dimension of the `array` represents the chain
@@ -172,16 +169,17 @@ via the `dimension_chain` argument.
 out_array2 <- stanova_samples(m_machines, dimension_chain = 2)
 str(out_array2)
 #> List of 2
-#>  $ (Intercept): num [1:250, 1:2, 1] 63.8 63.9 56.2 58.3 57.7 ...
+#>  $ (Intercept): num [1:250, 1:2, 1] 57.7 59.9 60.6 61.2 59.6 ...
 #>   ..- attr(*, "dimnames")=List of 3
 #>   .. ..$ Iteration: chr [1:250] "1" "2" "3" "4" ...
 #>   .. ..$ Chain    : chr [1:2] "chain:1" "chain:2"
 #>   .. ..$ Parameter: chr "(Intercept)"
-#>  $ Machine    : num [1:250, 1:2, 1:3] -7.69 -7.46 -6.53 -9.38 -8.55 ...
+#>  $ Machine    : num [1:250, 1:2, 1:3] -6.38 -8.17 -7.86 -8.12 -7.63 ...
 #>   ..- attr(*, "dimnames")=List of 3
 #>   .. ..$ Iteration: chr [1:250] "1" "2" "3" "4" ...
 #>   .. ..$ Chain    : chr [1:2] "chain:1" "chain:2"
 #>   .. ..$ Parameter: chr [1:3] "Machine A" "Machine B" "Machine C"
+#>   ..- attr(*, "estimate")= chr "difference from intercept"
 ```
 
 This makes it easy to produce plots via the `bayesplot` package on the
