@@ -69,7 +69,7 @@ summary.stanova <- function(object,
     nobs = attr(tmp2, "nobs"),
     npreds = attr(tmp2, "npreds"),
     ngrps = attr(tmp2, "ngrps"),
-    diff_intercept = diff_intercept,
+    estimate = unlist(lapply(array_diff, function(x) attr(x, "estimate"))),
     print.digits = digits,
     priors = object$prior.info,
     no_ppd_diagnostic = attr(tmp2, "no_ppd_diagnostic"),
@@ -120,13 +120,10 @@ print.summary.stanova <-
     cat("\n")
 
     for (i in seq_len(length(x)-1)) {
-      cat("\nEstimates '", names(x)[i+1] ,"':\n", sep = "")
+      cat("\nEstimates '", names(x)[i+1] ,"' - ",
+          atts$estimate[i],
+          ":\n", sep = "")
       print(x[[i+1]], digits = digits)
-    }
-    if (isTRUE(atts$diff_intercept)) {
-      cat("\nNote: Estimates of factor-levels represent differences from Intercept.\n")
-    } else if (isFALSE(atts$diff_intercept)) {
-      cat("\nNote: Estimates of factor-levels represent marginal means.\n")
     }
     invisible(x)
   }

@@ -42,16 +42,13 @@ stanova_samples.stanova <- function(
   names(term2) <- terms_chr
 
   ### extract samples as arrays
-  post_intercept <- as.array(object, pars = "(Intercept)")
-  post_intercept <- aperm(post_intercept, perm = c(1, 3, 2))
-  names(dimnames(post_intercept)) <- c("Iteration", "Parameter", "Chain")
+  post_intercept <- extract_array_rstanarm(object, pars = "(Intercept)")
 
   post_diff <- lapply(term2, get_stanova_samples,
                       object = object,
                       diff_intercept = diff_intercept,
                       intercept_array = post_intercept,
                       dimension_chain = dimension_chain)
-  dimnames(post_intercept)[[1]] <- dimnames(post_diff[[1]])[[1]]
   dims <- c("iter" = 1, "par" = 2, "chain" = 3)
   if (dimension_chain == 2L) {
     post_intercept <- aperm(post_intercept, c(1, 3, 2))
@@ -68,6 +65,7 @@ stanova_samples.stanova <- function(
 
   if (return == "matrix") {
     for (i in seq_along(out)) {
+      type_est <- attr(out[[i]], "estimate")
       tmp_arr <- aperm(out[[i]],
                        c(dims["iter"],dims["chain"],dims["par"]))
       dim(tmp_arr) <- c(
@@ -76,6 +74,7 @@ stanova_samples.stanova <- function(
       )
       colnames(tmp_arr) <- dimnames(out[[i]])[["Parameter"]]
       out[[i]] <- tmp_arr
+      attr(out[[i]], "estimate") <- type_est
     }
 
     # ### extract samples as matrices
@@ -93,7 +92,9 @@ stanova_samples.stanova <- function(
 
   if (return == "data.frame") {
     for (i in seq_along(out)) {
+      type_est <- attr(out[[i]], "estimate")
       out[[i]] <- as.data.frame.table(out[[i]], responseName = "Value")
+      attr(out[[i]], "estimate") <- type_est
     }
   }
 
@@ -103,9 +104,26 @@ stanova_samples.stanova <- function(
 get_stanova_samples <- function(term, object, diff_intercept,
                                 intercept_array,
                                 dimension_chain) {
-  if (any(vapply(object[["data"]][,term], is.numeric, TRUE))) {
-    stop("not yet implemented ):")
-    tmp <- coda::as.mcmc(emmeans::emmeans(object, term))
+  num_vars <- vapply(object[["data"]][,term], is.numeric, TRUE)
+  if (any(num_vars)) {
+    if (length(term) == 1) {
+      tmp <- extract_array_rstanarm(object, pars = term)
+      attr(tmp, "estimate") <- paste0("trend ('", term, "')")
+    } else {
+      i <- 1 ## which numerical variable is chosen, default is 1
+      tmp <- coda::as.mcmc(emmeans::emtrends(
+        object = object,
+        specs = term[-which(num_vars)[i]],
+        var = term[which(num_vars)[i]]
+      ))
+      if (!coda::is.mcmc.list(tmp)) {
+        tmp <- coda::as.mcmc.list(tmp)
+      }
+      tmp <- as.array(tmp, drop = FALSE)
+      dimnames(tmp)[[3]] <- dimnames(intercept_array)[[3]]
+      names(dimnames(tmp)) <- names(dimnames(intercept_array))
+      attr(tmp, "estimate") <- paste0("trend ('", term[which(num_vars)[i]], "')")
+    }
   } else {
       ## extract samples per factor-level or design cell and concatenate chains
       tmp <- coda::as.mcmc(emmeans::emmeans(object, term))
@@ -120,15 +138,30 @@ get_stanova_samples <- function(term, object, diff_intercept,
           tmp[ ,j, ] <- tmp[ ,j, ] -
             intercept_array[, 1, ]
         }
+        attr(tmp, "estimate") <- "difference from intercept"
+      } else {
+        attr(tmp, "estimate") <- "marginal means"
       }
       dimnames(tmp)[[3]] <- dimnames(intercept_array)[[3]]
       names(dimnames(tmp)) <- names(dimnames(intercept_array))
-      if (dimension_chain == 2L) {
-        tmp <- aperm(tmp, c(1, 3, 2))
-      }
-      if (dimension_chain == 1L) {
-        tmp <- aperm(tmp, c(3, 1, 2))
-      }
-      tmp
   }
+  if (dimension_chain == 2L) {
+    type_est <- attr(tmp, "estimate")
+    tmp <- aperm(tmp, c(1, 3, 2))
+    attr(tmp, "estimate") <- type_est
+  }
+  if (dimension_chain == 1L) {
+    type_est <- attr(tmp, "estimate")
+    tmp <- aperm(tmp, c(3, 1, 2))
+    attr(tmp, "estimate") <- type_est
+  }
+  tmp
+}
+
+extract_array_rstanarm <- function(object, pars) {
+  post <- as.array(object, pars = pars)
+  post <- aperm(post, perm = c(1, 3, 2))
+  names(dimnames(post)) <- c("Iteration", "Parameter", "Chain")
+  dimnames(post)[[1]] <- as.character(seq_len(dim(post)[1]))
+  post
 }
