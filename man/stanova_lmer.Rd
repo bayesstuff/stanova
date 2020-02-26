@@ -11,7 +11,7 @@ stanova_glmer(formula, data, family, check_contrasts = "contr.bayes", ...)
 }
 \arguments{
 \item{formula}{a formula describing the full mixed-model to be fitted. Passed
-to \code{\link[rstanarm:stan_lmer]{rstanarm::stan_lmer()}}.}
+to \code{rstanarm::stan_g/lmer}.}
 
 \item{data}{\code{data.frame} containing the data.}
 
@@ -20,7 +20,9 @@ function which should be assigned to all \code{character} and \code{factor} vari
 in the model (as long as the specified contrast is not the global default).
 Default is \link{contr.bayes}.}
 
-\item{...}{further arguments passed to \code{\link[rstanarm:stan_lmer]{rstanarm::stan_lmer}}.}
+\item{...}{further arguments passed to \code{rstanarm::stan_g/lmer}.}
+
+\item{family}{\code{family} argument passed to \code{stan_glmer}.}
 }
 \description{
 Estimate ANOVA-type models with rstanarm

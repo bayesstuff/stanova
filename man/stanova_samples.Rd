@@ -36,8 +36,6 @@ abbreviated.}
 \item{dimension_chain}{Scalar integer. If \code{return = "array"}, determines the
 dimension of the chain. The default \code{3} means chain is the third dimension
 of the returned array. Value should be between 1 and 3.}
-
-\item{family}{\code{family} argument passed to \code{stan_glmer}.}
 }
 \description{
 Posterior samples representing difference from intercept
