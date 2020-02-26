@@ -36,7 +36,7 @@ summary.stanova <- function(object,
   names(out) <- names(summaries)
   for (i in seq_along(out)) {
     out[[i]] <- data.frame(
-      tested = rownames(summaries[[i]])
+      Variable = rownames(summaries[[i]])
     )
     out[[i]] <- cbind(out[[i]], summaries[[i]])
     out[[i]]$rhat <- rhat[[i]]
@@ -81,6 +81,7 @@ formula_string <- function (formula, break_and_indent = TRUE)
   gsub("--MARK--", "\n\t  ", char, fixed = TRUE)
 }
 
+#' @export
 print.summary.stanova <-
   function(x, digits = max(3L, attr(x, "print.digits")),
            ...) {

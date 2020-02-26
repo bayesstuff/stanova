@@ -26,6 +26,22 @@ m2
 summary(m2)
 
 
+\dontrun{
+## with continuous variable (DOES NOT WORK YET)
+data(md_16.4, package = "afex")
+md_16.4$cog <- scale(md_16.4$cog, scale=FALSE)
+
+
+m_cont0 <- stanova_lmer(induct ~ cog + (cog|room:cond), md_16.4,
+                        chains = 1, iter = 500)
+summary(m_cont0)
+
+# with interaction:
+m_cont1 <- stanova_lmer(induct ~ cond*cog + (cog|room:cond), md_16.4,
+                        chains = 2, iter = 500)
+summary(m_cont1)
+}
+
 ### glmer models
 
 ## binomial model

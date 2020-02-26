@@ -1,4 +1,4 @@
-#' Extract stanova difference from intercept samples
+#' Posterior samples representing difference from intercept
 #'
 #' @param object Fitted model. Currently only tested for `stanova` objects but
 #'   likely supports `rstanarm` and potentially other objects as well.
@@ -12,7 +12,12 @@
 #'   of the returned array. Value should be between 1 and 3.
 #'
 #' @export
-stanova_samples <- function(object,
+stanova_samples <- function(object, ...) UseMethod("stanova_samples", object)
+
+
+#' @rdname stanova_samples
+#' @export
+stanova_samples.stanova <- function(object,
                             terms,
                             return = c("array", "matrix", "data.frame"),
                             dimension_chain = 3L,

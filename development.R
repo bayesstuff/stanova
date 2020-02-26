@@ -18,6 +18,7 @@ use_package("stats")
 use_package("MEMSS", type = "Suggests")
 use_package("afex", type = "Suggests")
 use_package("glmmTMB", type = "Suggests")
+use_package("bayesplot", type = "Suggests")
 
 library(usethis)
 
@@ -27,3 +28,4 @@ use_git()
 use_testthat()
 use_test("single_chain")
 use_roxygen_md()
+use_readme_rmd()

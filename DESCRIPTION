@@ -1,15 +1,22 @@
 Package: stanova
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
+Title: Bayesian Models with Categorical Variables
+Version: 0.1-0
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    c(person(given = "Henrik",
+           family = "Singmann",
            role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to
-    pick a license
+           email = "singmann@gmail.com",
+           comment = c(ORCID = "0000-0002-4842-3657")),
+      person("Jonah", "Gabry", role = "ctb"), 
+      person("Ben", "Goodrich", role = "ctb"))
+Description: Improved summary() methods for Bayesian statistical models with 
+    categorical variables with more than two factor levels that interact with 
+    other variables. Instead of the values of the coefficients 
+    (which cannot be interpreted in such cases), output is given per factor 
+    level and represent difference from intercept (i.e., unweighted grand mean).  
+    In addition, appropriate contrasts that have the same marginal effects on 
+    all factor levels are used per default.
+License: GPL (>=2)
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
@@ -25,4 +32,5 @@ Suggests:
     testthat (>= 2.1.0),
     MEMSS,
     afex,
-    glmmTMB
+    glmmTMB,
+    bayesplot

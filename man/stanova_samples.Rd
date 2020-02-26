@@ -2,9 +2,12 @@
 % Please edit documentation in R/stanova_samples.R
 \name{stanova_samples}
 \alias{stanova_samples}
-\title{Extract stanova difference from intercept samples}
+\alias{stanova_samples.stanova}
+\title{Posterior samples representing difference from intercept}
 \usage{
-stanova_samples(
+stanova_samples(object, ...)
+
+\method{stanova_samples}{stanova}(
   object,
   terms,
   return = c("array", "matrix", "data.frame"),
@@ -28,5 +31,5 @@ dimension of the chain. The default \code{3} means chain is the third dimension
 of the returned array. Value should be between 1 and 3.}
 }
 \description{
-Extract stanova difference from intercept samples
+Posterior samples representing difference from intercept
 }
