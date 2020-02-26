@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
 # stanova
 
 <!-- badges: start -->
+[![Travis build status](https://travis-ci.org/bayesstuff/stanova.svg?branch=master)](https://travis-ci.org/bayesstuff/stanova)
 <!-- badges: end -->
 
 The goal of `stanova` is to provide a more relevant and interpretable `summary` for Bayesian models with categorical covariates and possibly interactions. At the moment, it only provides wrappers for `rstanarm` via functions `stanova_lmer` and `stanova_glmer`.
@@ -73,5 +74,5 @@ bayesplot::mcmc_trace(out_array2$Machine)
 
 # References
 
-Rouder, J. N., Morey, R. D., Speckman, P. L., & Province, J. M. (2012). Default Bayes factors for ANOVA designs. Journal of Mathematical Psychology, 56(5), 356–374. https://doi.org/10.1016/j.jmp.2012.08.001
+Rouder, J. N., Morey, R. D., Speckman, P. L., & Province, J. M. (2012). Default Bayes factors for ANOVA designs. Journal of Mathematical Psychology, 56(5), 356â€“374. https://doi.org/10.1016/j.jmp.2012.08.001
 

@@ -3,3 +3,4 @@
 ^development\.R$
 ^examples$
 ^README\.Rmd$
+^\.travis\.yml$

@@ -5,6 +5,8 @@
 
 <!-- badges: start -->
 
+[![Travis build
+status](https://travis-ci.org/bayesstuff/stanova.svg?branch=master)](https://travis-ci.org/bayesstuff/stanova)
 <!-- badges: end -->
 
 The goal of `stanova` is to provide a more relevant and interpretable
@@ -96,14 +98,14 @@ summary(m_machines)
 #> 
 #> Estimate Intercept:
 #>      Variable Mean MAD_SD   5%  50%  95% rhat ess_bulk ess_tail
-#> 1 (Intercept) 59.7   2.08 56.6 59.5 63.2 1.03      100      201
+#> 1 (Intercept) 59.4   2.09 55.9 59.3 63.4 1.02      114      138
 #> 
 #> 
 #> Estimates 'Machine':
 #>    Variable   Mean MAD_SD    5%    50%   95% rhat ess_bulk ess_tail
-#> 1 Machine A -7.404   1.29 -9.62 -7.343 -5.62 1.01      218      159
-#> 2 Machine B  0.821   1.53 -1.82  0.841  3.40 1.01      193      196
-#> 3 Machine C  6.583   1.09  4.71  6.541  8.54 1.01      234      226
+#> 1 Machine A -7.242   1.29 -9.50 -7.216 -5.16 1.00      183      261
+#> 2 Machine B  0.554   1.52 -1.91  0.505  2.92 1.00      124      161
+#> 3 Machine C  6.688   1.12  4.59  6.703  8.63 1.01      133      139
 ```
 
 The key to this output is the `stanova_samples()` function which takes a
@@ -116,12 +118,12 @@ default output is an `array`, but this can be changed to a `matrix` or
 out_array <- stanova_samples(m_machines)
 str(out_array)
 #> List of 2
-#>  $ (Intercept): num [1:250, 1, 1:2] 59.7 61.2 57.2 58 58.3 ...
+#>  $ (Intercept): num [1:250, 1, 1:2] 61.1 61 60.9 60.5 59.9 ...
 #>   ..- attr(*, "dimnames")=List of 3
 #>   .. ..$ Iteration: chr [1:250] "1" "2" "3" "4" ...
 #>   .. ..$ Parameter: chr "(Intercept)"
 #>   .. ..$ Chain    : chr [1:2] "chain:1" "chain:2"
-#>  $ Machine    : num [1:250, 1:3, 1:2] -6.66 -6.61 -5.67 -3.55 -7.54 ...
+#>  $ Machine    : num [1:250, 1:3, 1:2] -8.69 -8.01 -8.99 -9.06 -9.46 ...
 #>   ..- attr(*, "dimnames")=List of 3
 #>   .. ..$ Iteration: chr [1:250] "1" "2" "3" "4" ...
 #>   .. ..$ Parameter: chr [1:3] "Machine A" "Machine B" "Machine C"
@@ -135,12 +137,12 @@ via the `dimension_chain` argument.
 out_array2 <- stanova_samples(m_machines, dimension_chain = 2)
 str(out_array2)
 #> List of 2
-#>  $ (Intercept): num [1:250, 1:2, 1] 59.7 61.2 57.2 58 58.3 ...
+#>  $ (Intercept): num [1:250, 1:2, 1] 61.1 61 60.9 60.5 59.9 ...
 #>   ..- attr(*, "dimnames")=List of 3
 #>   .. ..$ Iteration: chr [1:250] "1" "2" "3" "4" ...
 #>   .. ..$ Chain    : chr [1:2] "chain:1" "chain:2"
 #>   .. ..$ Parameter: chr "(Intercept)"
-#>  $ Machine    : num [1:250, 1:2, 1:3] -6.66 -6.61 -5.67 -3.55 -7.54 ...
+#>  $ Machine    : num [1:250, 1:2, 1:3] -8.69 -8.01 -8.99 -9.06 -9.46 ...
 #>   ..- attr(*, "dimnames")=List of 3
 #>   .. ..$ Iteration: chr [1:250] "1" "2" "3" "4" ...
 #>   .. ..$ Chain    : chr [1:2] "chain:1" "chain:2"
@@ -160,4 +162,5 @@ bayesplot::mcmc_trace(out_array2$Machine)
 
 Rouder, J. N., Morey, R. D., Speckman, P. L., & Province, J. M. (2012).
 Default Bayes factors for ANOVA designs. Journal of Mathematical
-Psychology, 56(5), 356–374. <https://doi.org/10.1016/j.jmp.2012.08.001>
+Psychology, 56(5), 356â€“374.
+<https://doi.org/10.1016/j.jmp.2012.08.001>
