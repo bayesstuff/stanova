@@ -3,7 +3,9 @@ data("Machines", package = "MEMSS")
 
 m_machines <- stanova_lmer(score ~ Machine + (Machine|Worker),
                            data=Machines, chains = 2, iter = 500)
-summary(m_machines)
+summary(m_machines) ## default: difference from intercept
+
+summary(m_machines, diff_intercept = FALSE) ## alt: marginal means
 
 out_array <- stanova_samples(m_machines)
 str(out_array)

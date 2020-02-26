@@ -9,6 +9,7 @@ stanova_samples(object, ...)
 
 \method{stanova_samples}{stanova}(
   object,
+  diff_intercept = TRUE,
   terms,
   return = c("array", "matrix", "data.frame"),
   dimension_chain = 3L,
@@ -16,10 +17,14 @@ stanova_samples(object, ...)
 )
 }
 \arguments{
-\item{object}{Fitted model. Currently only tested for \code{stanova} objects but
+\item{object}{Fitted model. Currently only support for \code{stanova} objects but
 likely supports \code{rstanarm} and potentially other objects as well.}
 
 \item{...}{currently ignored.}
+
+\item{diff_intercept}{logical. If TRUE (the default) samples for factor
+levels represent the difference from the intercept. If FALSE, marginal
+means of factor levels are returned.}
 
 \item{terms}{optional character vector denoting a subset of model terms for
 which difference from intercept be returned.}

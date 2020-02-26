@@ -98,32 +98,67 @@ summary(m_machines)
 #> 
 #> Estimate Intercept:
 #>      Variable Mean MAD_SD   5%  50%  95% rhat ess_bulk ess_tail
-#> 1 (Intercept) 59.4   2.09 55.9 59.3 63.4 1.02      114      138
+#> 1 (Intercept) 59.6   1.85 56.4 59.5 63.2    1      175      270
 #> 
 #> 
 #> Estimates 'Machine':
-#>    Variable   Mean MAD_SD    5%    50%   95% rhat ess_bulk ess_tail
-#> 1 Machine A -7.242   1.29 -9.50 -7.216 -5.16 1.00      183      261
-#> 2 Machine B  0.554   1.52 -1.91  0.505  2.92 1.00      124      161
-#> 3 Machine C  6.688   1.12  4.59  6.703  8.63 1.01      133      139
+#>    Variable  Mean MAD_SD    5%    50%   95% rhat ess_bulk ess_tail
+#> 1 Machine A -7.47   1.24 -9.76 -7.415 -5.52 1.01      216      259
+#> 2 Machine B  0.79   1.28 -1.25  0.637  3.07 1.00      170      242
+#> 3 Machine C  6.68   1.18  4.62  6.636  8.94 1.00      216      220
+#> 
+#> Note: Estimates of factor-levels represent differences from Intercept.
 ```
 
-The key to this output is the `stanova_samples()` function which takes a
+If one is not interested in the differences from the factor levels, it
+is also possible to obtain the estimates marginal means. For this one
+just needs to set `diff_intercept = FALSE`.
+
+``` r
+summary(m_machines, diff_intercept = FALSE)
+#> 
+#> Model Info:
+#>  function:     stanova_lmer
+#>  family:       gaussian [identity]
+#>  formula:      score ~ Machine + (Machine | Worker)
+#>  algorithm:    sampling
+#>  chains:       2
+#>  sample:       500 (posterior sample size)
+#>  priors:       see help('prior_summary', package = 'rstanarm')
+#>  observations: 54
+#>  groups:       Worker (6)
+#> 
+#> Estimate Intercept:
+#>      Variable Mean MAD_SD   5%  50%  95% rhat ess_bulk ess_tail
+#> 1 (Intercept) 59.6   1.85 56.4 59.5 63.2    1      175      270
+#> 
+#> 
+#> Estimates 'Machine':
+#>    Variable Mean MAD_SD   5%  50%  95%  rhat ess_bulk ess_tail
+#> 1 Machine A 52.1   1.76 48.8 52.1 55.1 0.999      194      284
+#> 2 Machine B 60.4   2.94 55.8 60.1 65.7 1.004      169      229
+#> 3 Machine C 66.3   1.85 63.0 66.2 69.7 1.033      202      235
+#> 
+#> Note: Estimates of factor-levels represent marginal means.
+```
+
+The key to the output is the `stanova_samples()` function which takes a
 fitted model objects and returns the posterior samples transformed to
-represent the difference from the intercept for each factor level. The
-default output is an `array`, but this can be changed to a `matrix` or
-`data.frame` with the `return` argument.
+represent the difference from the intercept for each factor level (or
+the marginal means if `diff_intercept = FALSE`). The default output is
+an `array`, but this can be changed to a `matrix` or `data.frame` with
+the `return` argument.
 
 ``` r
 out_array <- stanova_samples(m_machines)
 str(out_array)
 #> List of 2
-#>  $ (Intercept): num [1:250, 1, 1:2] 61.1 61 60.9 60.5 59.9 ...
+#>  $ (Intercept): num [1:250, 1, 1:2] 63.8 63.9 56.2 58.3 57.7 ...
 #>   ..- attr(*, "dimnames")=List of 3
 #>   .. ..$ Iteration: chr [1:250] "1" "2" "3" "4" ...
 #>   .. ..$ Parameter: chr "(Intercept)"
 #>   .. ..$ Chain    : chr [1:2] "chain:1" "chain:2"
-#>  $ Machine    : num [1:250, 1:3, 1:2] -8.69 -8.01 -8.99 -9.06 -9.46 ...
+#>  $ Machine    : num [1:250, 1:3, 1:2] -7.69 -7.46 -6.53 -9.38 -8.55 ...
 #>   ..- attr(*, "dimnames")=List of 3
 #>   .. ..$ Iteration: chr [1:250] "1" "2" "3" "4" ...
 #>   .. ..$ Parameter: chr [1:3] "Machine A" "Machine B" "Machine C"
@@ -137,12 +172,12 @@ via the `dimension_chain` argument.
 out_array2 <- stanova_samples(m_machines, dimension_chain = 2)
 str(out_array2)
 #> List of 2
-#>  $ (Intercept): num [1:250, 1:2, 1] 61.1 61 60.9 60.5 59.9 ...
+#>  $ (Intercept): num [1:250, 1:2, 1] 63.8 63.9 56.2 58.3 57.7 ...
 #>   ..- attr(*, "dimnames")=List of 3
 #>   .. ..$ Iteration: chr [1:250] "1" "2" "3" "4" ...
 #>   .. ..$ Chain    : chr [1:2] "chain:1" "chain:2"
 #>   .. ..$ Parameter: chr "(Intercept)"
-#>  $ Machine    : num [1:250, 1:2, 1:3] -8.69 -8.01 -8.99 -9.06 -9.46 ...
+#>  $ Machine    : num [1:250, 1:2, 1:3] -7.69 -7.46 -6.53 -9.38 -8.55 ...
 #>   ..- attr(*, "dimnames")=List of 3
 #>   .. ..$ Iteration: chr [1:250] "1" "2" "3" "4" ...
 #>   .. ..$ Chain    : chr [1:2] "chain:1" "chain:2"
@@ -156,7 +191,7 @@ level of the differences from the intercept:
 bayesplot::mcmc_trace(out_array2$Machine)
 ```
 
-<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
 
 # References
 

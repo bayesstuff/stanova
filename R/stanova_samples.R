@@ -1,7 +1,10 @@
 #' Posterior samples representing difference from intercept
 #'
-#' @param object Fitted model. Currently only tested for `stanova` objects but
+#' @param object Fitted model. Currently only support for `stanova` objects but
 #'   likely supports `rstanarm` and potentially other objects as well.
+#' @param diff_intercept logical. If TRUE (the default) samples for factor
+#'   levels represent the difference from the intercept. If FALSE, marginal
+#'   means of factor levels are returned.
 #' @param terms optional character vector denoting a subset of model terms for
 #'   which difference from intercept be returned.
 #' @param return `character` string denoting format in which samples should be
@@ -21,11 +24,14 @@ stanova_samples <- function(object, ...) UseMethod("stanova_samples", object)
 
 #' @rdname stanova_samples
 #' @export
-stanova_samples.stanova <- function(object,
-                            terms,
-                            return = c("array", "matrix", "data.frame"),
-                            dimension_chain = 3L,
-                            ...) {
+stanova_samples.stanova <- function(
+  object,
+  diff_intercept = TRUE,
+  terms,
+  return = c("array", "matrix", "data.frame"),
+  dimension_chain = 3L,
+  ...
+) {
   return <- match.arg(return)
   all_terms <- stats::terms(lme4::nobars(object$formula))
   terms_chr <- attr(all_terms, "term.labels")
@@ -44,6 +50,7 @@ stanova_samples.stanova <- function(object,
 
   post_diff <- lapply(term2, get_stanova_samples,
                       object = object,
+                      diff_intercept = diff_intercept,
                       intercept_array = post_intercept,
                       dimension_chain = dimension_chain)
   dimnames(post_intercept)[[1]] <- dimnames(post_diff[[1]])[[1]]
@@ -95,7 +102,8 @@ stanova_samples.stanova <- function(object,
   return(out)
 }
 
-get_stanova_samples <- function(term, object, intercept_array,
+get_stanova_samples <- function(term, object, diff_intercept,
+                                intercept_array,
                                 dimension_chain) {
   if (any(vapply(object[["data"]][,term], is.numeric, TRUE))) {
     stop("not yet implemented ):")
@@ -109,9 +117,11 @@ get_stanova_samples <- function(term, object, intercept_array,
         tmp <- coda::as.mcmc.list(tmp)
       }
       tmp <- as.array(tmp, drop = FALSE)
-      for (j in seq_len(dim(tmp)[2])) {
-        tmp[ ,j, ] <- tmp[ ,j, ] -
-          intercept_array[, 1, ]
+      if (diff_intercept) {
+        for (j in seq_len(dim(tmp)[2])) {
+          tmp[ ,j, ] <- tmp[ ,j, ] -
+            intercept_array[, 1, ]
+        }
       }
       dimnames(tmp)[[3]] <- dimnames(intercept_array)[[3]]
       names(dimnames(tmp)) <- names(dimnames(intercept_array))

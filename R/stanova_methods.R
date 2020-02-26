@@ -1,11 +1,14 @@
 #' @export
 summary.stanova <- function(object,
+                            diff_intercept = TRUE,
                             probs = c(0.05, 0.5, 0.95),
                             ...,
                             digits = 3L) {
 
   ## get summaries:
-  matrix_diff <- stanova_samples(object, return = "matrix")
+  matrix_diff <- stanova_samples(object,
+                                 diff_intercept = diff_intercept,
+                                 return = "matrix")
   summaries <- lapply(matrix_diff, function(x) {
     cbind(
       Mean = apply(x, 2L, mean)
@@ -15,7 +18,9 @@ summary.stanova <- function(object,
   })
 
   ## get diagnostics:
-  array_diff <- stanova_samples(object, return = "array")
+  array_diff <- stanova_samples(object,
+                                diff_intercept = diff_intercept,
+                                return = "array")
   rhat <- lapply(
     array_diff,
     function(x)
@@ -63,6 +68,7 @@ summary.stanova <- function(object,
     nobs = attr(tmp2, "nobs"),
     npreds = attr(tmp2, "npreds"),
     ngrps = attr(tmp2, "ngrps"),
+    diff_intercept = diff_intercept,
     print.digits = digits,
     priors = object$prior.info,
     no_ppd_diagnostic = attr(tmp2, "no_ppd_diagnostic"),
@@ -110,10 +116,16 @@ print.summary.stanova <-
 
     cat("\n\nEstimate Intercept:\n")
     print(x$`(Intercept)`, digits = digits)
+    cat("\n")
 
     for (i in seq_len(length(x)-1)) {
-      cat("\n\nEstimates '", names(x)[i+1] ,"':\n", sep = "")
+      cat("\nEstimates '", names(x)[i+1] ,"':\n", sep = "")
       print(x[[i+1]], digits = digits)
+    }
+    if (isTRUE(atts$diff_intercept)) {
+      cat("\nNote: Estimates of factor-levels represent differences from Intercept.\n")
+    } else if (isFALSE(atts$diff_intercept)) {
+      cat("\nNote: Estimates of factor-levels represent marginal means.\n")
     }
     invisible(x)
   }
