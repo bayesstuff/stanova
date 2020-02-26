@@ -10,6 +10,10 @@
 #' @param dimension_chain Scalar integer. If `return = "array"`, determines the
 #'   dimension of the chain. The default `3` means chain is the third dimension
 #'   of the returned array. Value should be between 1 and 3.
+#' @param family `family` argument passed to `stan_glmer`.
+#' @param ... currently ignored.
+#'
+#' @importFrom stats mad quantile
 #'
 #' @export
 stanova_samples <- function(object, ...) UseMethod("stanova_samples", object)

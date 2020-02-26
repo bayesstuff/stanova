@@ -19,6 +19,8 @@ stanova_samples(object, ...)
 \item{object}{Fitted model. Currently only tested for \code{stanova} objects but
 likely supports \code{rstanarm} and potentially other objects as well.}
 
+\item{...}{currently ignored.}
+
 \item{terms}{optional character vector denoting a subset of model terms for
 which difference from intercept be returned.}
 
@@ -29,6 +31,8 @@ abbreviated.}
 \item{dimension_chain}{Scalar integer. If \code{return = "array"}, determines the
 dimension of the chain. The default \code{3} means chain is the third dimension
 of the returned array. Value should be between 1 and 3.}
+
+\item{family}{\code{family} argument passed to \code{stan_glmer}.}
 }
 \description{
 Posterior samples representing difference from intercept
