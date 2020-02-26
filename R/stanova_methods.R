@@ -1,3 +1,4 @@
+#' @importFrom stats mad quantile
 #' @export
 summary.stanova <- function(object,
                             diff_intercept = TRUE,

@@ -16,8 +16,6 @@
 #' @param family `family` argument passed to `stan_glmer`.
 #' @param ... currently ignored.
 #'
-#' @importFrom stats mad quantile
-#'
 #' @export
 stanova_samples <- function(object, ...) UseMethod("stanova_samples", object)
 
