@@ -2,9 +2,12 @@
 % Please edit documentation in R/stanova_lmer.R
 \name{stanova_lmer}
 \alias{stanova_lmer}
+\alias{stanova_glmer}
 \title{Estimate ANOVA-type models with rstanarm}
 \usage{
 stanova_lmer(formula, data, check_contrasts = "contr.bayes", ...)
+
+stanova_glmer(formula, data, family, check_contrasts = "contr.bayes", ...)
 }
 \arguments{
 \item{formula}{a formula describing the full mixed-model to be fitted. Passed

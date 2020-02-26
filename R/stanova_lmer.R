@@ -33,6 +33,7 @@ stanova_lmer <- function(
   return(mout)
 }
 
+#' @rdname stanova_lmer
 #' @export
 stanova_glmer <- function(
   formula,
