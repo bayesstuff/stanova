@@ -87,23 +87,13 @@ cbpp <- lme4::cbpp
 cbpp$prob <- with(cbpp, incidence / size)
 example_model <- stanova_glmer(prob ~ period + (1|herd),
                             data = cbpp, family = binomial,
-                            weight = size,
+                            weight = quote(size),
                             chains = 2, cores = 1, seed = 12345, iter = 500)
+## Note: we need to quote() the weight column.
+## Alterntively passing the column directly also works: cpbb$weights
+
 summary(example_model)
 
-\dontrun{
-## to run this call in a function, make sure to quote() the weight argument:
-tmp <- function() {
-  cbpp <- lme4::cbpp
-  cbpp$prob <- cbpp$incidence / cbpp$size
-  example_model <- stanova_glmer(prob ~ period + (1|herd),
-                                 data = cbpp, family = binomial,
-                                 weight = quote(size),
-                                 chains = 2, cores = 1,
-                                 seed = 12345, iter = 500)
-}
-tmp()
-}
 
 ## poisson model
 data(Salamanders, package = "glmmTMB")
