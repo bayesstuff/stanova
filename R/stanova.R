@@ -1,16 +1,17 @@
 #' Estimate ANOVA-type models with rstanarm
 #'
-#' @param formula a formula describing the full mixed-model to be fitted. Passed
-#'   to `rstanarm::stan_g/lmer`.
+#' @param formula a formula describing the statistical model to be estimated.
+#'   Passed to the `rstanarm::stan_` function specified in `model_fun`.
 #' @param data `data.frame` containing the data.
 #' @param check_contrasts `character` string (of length 1) denoting a contrast
 #'   function which should be assigned to all `character` and `factor` variables
 #'   in the model (as long as the specified contrast is not the global default).
 #'   Default is [contr.bayes].
-#' @param family `family` argument passed to `stan_glmer`.
-#' @param ... further arguments passed to `rstanarm::stan_g/lmer`.
+#' @param ... further arguments passed to the specified `rstanarm::stan_`
+#'   function.
 #' @param model_fun character string identifying the `rstanarm` function that
-#'   should be used for fitting (omitting the `stan_` prefix).
+#'   should be used for fitting (omitting the `stan_` prefix) such as `"lm"` or
+#'   `"lmer"`.
 #'
 #' @example examples/examples.stanova.R
 #'
@@ -18,7 +19,7 @@
 stanova <- function(
   formula,
   data,
-  model_fun = "aov",
+  model_fun,
   ...,
   check_contrasts = "contr.bayes") {
   call <- match.call(expand.dots = TRUE)
@@ -30,7 +31,8 @@ stanova <- function(
   call["check_contrasts"] <- NULL
   call["model_fun"] <- NULL
 
-  call[[1]] <- getFromNamespace(paste0("stan_", model_fun), ns = "rstanarm")
+  call[[1]] <- str2lang(paste0("rstanarm::stan_", model_fun))
+  #call[[1]] <- getFromNamespace(paste0("stan_", model_fun), ns = "rstanarm")
   call[["data"]] <- data
   mout <- eval(call)
   mout$call <- call

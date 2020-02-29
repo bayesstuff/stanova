@@ -1,4 +1,4 @@
-#' Estimate ANOVA-type models with rstanarm
+#' Estimate ANOVA-type mixed models with rstanarm
 #'
 #' @param formula a formula describing the full mixed-model to be fitted. Passed
 #'   to `rstanarm::stan_g/lmer`.
@@ -11,6 +11,9 @@
 #' @param ... further arguments passed to `rstanarm::stan_g/lmer`.
 #' @example examples/examples.stanova_lmer.R
 #'
+#' @note These functions are only wrappers around [`stanova`] setting
+#'   `model_fun` to `"glmer"` (and `family = "gaussian"` for `stanova_lmer`).
+#'
 #' @export
 stanova_lmer <- function(
   formula,
@@ -18,20 +21,12 @@ stanova_lmer <- function(
   check_contrasts = "contr.bayes",
   ...) {
   call <- match.call(expand.dots = TRUE)
-
-  if (!is.null(check_contrasts)) {
-    data <- check_contrasts(formula = formula, data = data,
-                            new_contrast = check_contrasts)
-  }
-  mout <- rstanarm::stan_glmer(
-    formula = formula,
-    data = data,
-    family = "gaussian",
-    ...)
-  mout$call <- call
-  mout$stan_function <- "stanova_lmer"
-  class(mout) <- c("stanova", class(mout))
-  return(mout)
+  call[[1]] <- stanova
+  call["family"] <- "gaussian"
+  call["model_fun"] <- "glmer"
+  out <- eval(call)
+  out$stan_function <- "stanova_lmer"
+  return(out)
 }
 
 #' @rdname stanova_lmer
@@ -43,19 +38,8 @@ stanova_glmer <- function(
   check_contrasts = "contr.bayes",
   ...) {
   call <- match.call(expand.dots = TRUE)
-
-  if (!is.null(check_contrasts)) {
-    data <- check_contrasts(formula = formula, data = data,
-                            new_contrast = check_contrasts)
-  }
-  call["check_contrasts"] <- NULL
-
-  call[[1]] <- rstanarm::stan_glmer
-  call[["data"]] <- data
-  mout <- eval(call)
-  mout$call <- call
-  mout$stan_function <- "stanova_glmer"
-  class(mout) <- c("stanova", class(mout))
-  return(mout)
+  call[[1]] <- stanova
+  call["model_fun"] <- "glmer"
+  eval(call)
 }
 

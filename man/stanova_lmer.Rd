@@ -3,7 +3,7 @@
 \name{stanova_lmer}
 \alias{stanova_lmer}
 \alias{stanova_glmer}
-\title{Estimate ANOVA-type models with rstanarm}
+\title{Estimate ANOVA-type mixed models with rstanarm}
 \usage{
 stanova_lmer(formula, data, check_contrasts = "contr.bayes", ...)
 
@@ -25,7 +25,11 @@ Default is \link{contr.bayes}.}
 \item{family}{\code{family} argument passed to \code{stan_glmer}.}
 }
 \description{
-Estimate ANOVA-type models with rstanarm
+Estimate ANOVA-type mixed models with rstanarm
+}
+\note{
+These functions are only wrappers around \code{\link{stanova}} setting
+\code{model_fun} to \code{"glmer"} (and \code{family = "gaussian"} for \code{stanova_lmer}).
 }
 \examples{
 

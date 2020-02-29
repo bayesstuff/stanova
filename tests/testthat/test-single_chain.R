@@ -1,5 +1,4 @@
 test_that("Single chains work as expected", {
-  testthat::skip_on_cran()
   testthat::skip_if_not_installed("MEMSS")
   data("Machines", package = "MEMSS")
 
