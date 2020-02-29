@@ -37,18 +37,19 @@ summary.stanova <- function(object,
     function(x)
       vapply(seq_len(dim(x)[2]), function(y) rstan::ess_tail(x[,y,]), 1)
   )
-
   out <- vector("list", length = length(summaries))
   names(out) <- names(summaries)
   for (i in seq_along(out)) {
-    out[[i]] <- data.frame(
-      Variable = rownames(summaries[[i]])
-    )
-    out[[i]] <- cbind(out[[i]], summaries[[i]])
-    out[[i]]$rhat <- rhat[[i]]
-    out[[i]]$ess_bulk <- ess_bulk[[i]]
-    out[[i]]$ess_tail <- ess_tail[[i]]
-    rownames(out[[i]]) <- NULL
+    if (ncol(summaries[[i]]) > 0) {
+      out[[i]] <- data.frame(
+        Variable = rownames(summaries[[i]])
+      )
+      out[[i]] <- cbind(out[[i]], summaries[[i]])
+      out[[i]]$rhat <- rhat[[i]]
+      out[[i]]$ess_bulk <- ess_bulk[[i]]
+      out[[i]]$ess_tail <- ess_tail[[i]]
+      rownames(out[[i]]) <- NULL
+    }
   }
 
   ## get attributes from rstanarm summary:
