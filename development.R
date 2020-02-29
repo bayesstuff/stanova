@@ -19,7 +19,8 @@ use_package("MEMSS", type = "Suggests")
 use_package("afex", type = "Suggests")
 use_package("glmmTMB", type = "Suggests")
 use_package("bayesplot", type = "Suggests")
-use_test("stanova_lmer")
+use_package("tidybayes", type = "Suggests")
+use_test("stanova_samples")
 
 library(usethis)
 

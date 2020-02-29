@@ -1,19 +1,22 @@
-#' Posterior samples representing difference from intercept
+#' Posterior samples for ANOVA-type models
 #'
-#' @param object Fitted model. Currently only support for `stanova` objects but
-#'   likely supports `rstanarm` and potentially other objects as well.
-#' @param diff_intercept logical. If TRUE (the default) samples for factor
-#'   levels represent the difference from the intercept. If FALSE, marginal
+#' @param object Fitted model. Currently only support for `stanova` objects.
+#' @param diff_intercept logical. If `TRUE` (the default) samples for factor
+#'   levels represent the difference from the intercept. If `FALSE`, marginal
 #'   means of factor levels are returned.
 #' @param terms optional character vector denoting a subset of model terms for
 #'   which difference from intercept be returned.
 #' @param return `character` string denoting format in which samples should be
-#'   returned. Allowed values are `c("array", "matrix", "data.frame")`, possibly
-#'   abbreviated.
+#'   returned. Allowed values are
+#'   `c("array", "matrix", "data.frame", "tibble", "tidybayes")`,
+#'   possibly abbreviated.
+#'   `"tibble"` requires package `tibble`.
 #' @param dimension_chain Scalar integer. If `return = "array"`, determines the
 #'   dimension of the chain. The default `3` means chain is the third dimension
 #'   of the returned array. Value should be between 1 and 3.
 #' @param ... currently ignored.
+#'
+#' @example examples/examples.stanova_samples.R
 #'
 #' @export
 stanova_samples <- function(object, ...) UseMethod("stanova_samples", object)
@@ -25,7 +28,7 @@ stanova_samples.stanova <- function(
   object,
   diff_intercept = TRUE,
   terms,
-  return = c("array", "matrix", "data.frame"),
+  return = c("array", "matrix", "data.frame", "tibble", "tidybayes"),
   dimension_chain = 3L,
   ...
 ) {
@@ -77,11 +80,34 @@ stanova_samples.stanova <- function(
     }
   }
 
-  if (return == "data.frame") {
+  if (return %in% c("data.frame", "tibble", "tidybayes")) {
+    if (return %in% c("tibble", "tidybayes")) {
+      if (!requireNamespace("tibble", quietly = TRUE)) {
+        warning("package tibble is required for returning a tibble",
+                call. = FALSE)
+      }
+    }
     for (i in seq_along(out)) {
       type_est <- attr(out[[i]], "estimate")
-      out[[i]] <- as.data.frame.table(out[[i]], responseName = "Value")
+      out[[i]] <- cbind(
+        Term = names(out)[i],
+        as.data.frame.table(out[[i]], responseName = "Value")
+      )[, c("Term", "Parameter", "Value", "Chain", "Iteration")]
+      colnames(out[[i]])[2] <- "Variable"
+      out[[i]]$Iteration <- as.numeric(as.character(out[[i]]$Iteration))
+      out[[i]]$Chain <- as.numeric(substr(out[[i]]$Chain,
+                                          start = 7, stop = 1e6))
+      out[[i]]$Draw <- max(out[[i]]$Iteration) * (out[[i]]$Chain - 1) +
+        out[[i]]$Iteration
       attr(out[[i]], "estimate") <- type_est
+      if ((return %in% c("tibble", "tidybayes")) &&
+          requireNamespace("tibble", quietly = TRUE)) {
+        out[[i]] <- tibble::as_tibble(out[[i]])
+      }
+      if (return == "tidybayes") {
+        colnames(out[[i]]) <- c("term", "variable", "value",
+                                ".chain",	".iteration",	".draw")
+      }
     }
   }
 

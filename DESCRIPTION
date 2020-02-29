@@ -33,4 +33,6 @@ Suggests:
     MEMSS,
     afex,
     glmmTMB,
-    bayesplot
+    bayesplot,
+    tibble,
+    tidybayes

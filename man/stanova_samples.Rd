@@ -3,7 +3,7 @@
 \name{stanova_samples}
 \alias{stanova_samples}
 \alias{stanova_samples.stanova}
-\title{Posterior samples representing difference from intercept}
+\title{Posterior samples for ANOVA-type models}
 \usage{
 stanova_samples(object, ...)
 
@@ -11,32 +11,85 @@ stanova_samples(object, ...)
   object,
   diff_intercept = TRUE,
   terms,
-  return = c("array", "matrix", "data.frame"),
+  return = c("array", "matrix", "data.frame", "tibble", "tidybayes"),
   dimension_chain = 3L,
   ...
 )
 }
 \arguments{
-\item{object}{Fitted model. Currently only support for \code{stanova} objects but
-likely supports \code{rstanarm} and potentially other objects as well.}
+\item{object}{Fitted model. Currently only support for \code{stanova} objects.}
 
 \item{...}{currently ignored.}
 
-\item{diff_intercept}{logical. If TRUE (the default) samples for factor
-levels represent the difference from the intercept. If FALSE, marginal
+\item{diff_intercept}{logical. If \code{TRUE} (the default) samples for factor
+levels represent the difference from the intercept. If \code{FALSE}, marginal
 means of factor levels are returned.}
 
 \item{terms}{optional character vector denoting a subset of model terms for
 which difference from intercept be returned.}
 
 \item{return}{\code{character} string denoting format in which samples should be
-returned. Allowed values are \code{c("array", "matrix", "data.frame")}, possibly
-abbreviated.}
+returned. Allowed values are
+\code{c("array", "matrix", "data.frame", "tibble", "tidybayes")},
+possibly abbreviated.
+\code{"tibble"} requires package \code{tibble}.}
 
 \item{dimension_chain}{Scalar integer. If \code{return = "array"}, determines the
 dimension of the chain. The default \code{3} means chain is the third dimension
 of the returned array. Value should be between 1 and 3.}
 }
 \description{
-Posterior samples representing difference from intercept
+Posterior samples for ANOVA-type models
+}
+\examples{
+
+
+fit_warp <- stanova(breaks ~ wool * tension, data = warpbreaks,
+                    prior = rstanarm::R2(0.5),
+                    model_fun = "lm",
+                    chains = 2, iter = 500)
+
+arr_warp <- stanova_samples(fit_warp)
+str(arr_warp)
+
+mat_warp <- stanova_samples(fit_warp, return = "matrix")
+str(mat_warp)
+
+df_warp <- stanova_samples(fit_warp, return = "data.frame")
+str(df_warp)
+
+tail(df_warp$`wool:tension`)
+
+if (requireNamespace("tibble")) {
+  tbl_warp <- stanova_samples(fit_warp, return = "tibble")
+  tbl_warp
+}
+
+if (require("tidybayes") && require("tidyverse")) {
+  tidy_warp <- stanova_samples(fit_warp, return = "tidybayes")
+  tidy_warp
+
+  tidy_warp$tension \%>\%
+    group_by(variable) \%>\%
+    median_qi(value) \%>\%
+    ggplot(aes(y = variable, x = value, xmin = .lower, xmax = .upper)) +
+    geom_pointintervalh()
+
+  tidy_warp$tension \%>\%
+    ggplot(aes(y = variable, x = value)) +
+    stat_halfeyeh()
+
+  bind_rows(tidy_warp) \%>\%
+    ggplot(aes(y = variable, x = value)) +
+    stat_halfeyeh() +
+    facet_wrap(vars(term), scales = "free")
+
+   bind_rows(tidy_warp) \%>\%
+    ggplot(aes(y = variable, x = value)) +
+    stat_intervalh() +
+    facet_wrap(vars(term), scales = "free")
+
+}
+
+
 }

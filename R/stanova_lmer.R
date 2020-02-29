@@ -9,6 +9,7 @@
 #'   Default is [contr.bayes].
 #' @param family `family` argument passed to `stan_glmer`.
 #' @param ... further arguments passed to `rstanarm::stan_g/lmer`.
+#'
 #' @example examples/examples.stanova_lmer.R
 #'
 #' @note These functions are only wrappers around [`stanova`] setting
