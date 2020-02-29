@@ -7,8 +7,9 @@
 #'   function which should be assigned to all `character` and `factor` variables
 #'   in the model (as long as the specified contrast is not the global default).
 #'   Default is [contr.bayes]. Set to `NULL` to disable the check.
-#' @param ... further arguments passed to the specified `rstanarm::stan_`
-#'   function.
+#' @param ... further arguments passed to the `rstanarm` function used for
+#'   fitting. Typical arguments are `prior`, `prior_intercept`, `chain`, `iter`,
+#'   or `core`.
 #' @param model_fun character string identifying the `rstanarm` function that
 #'   should be used for fitting (omitting the `stan_` prefix) such as `"glm"` or
 #'   `"lmer"`.

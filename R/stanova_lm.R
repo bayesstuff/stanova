@@ -2,10 +2,8 @@
 #'
 #' @param formula a formula describing the model to be fitted. Passed to
 #'   `rstanarm::stan_glm`.
-#' @param data `data.frame` containing the data.
 #' @param family `family` argument passed to `stan_glm` (set to `"gaussian"` for
 #'   `stanova_lm` and `stanova_aov`).
-#' @param ... further arguments passed to `rstanarm::stan_glm`.
 #' @inheritParams stanova
 #'
 #' @example examples/examples.stanova_lm.R

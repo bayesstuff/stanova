@@ -16,8 +16,9 @@ Passed to the \code{rstanarm::stan_} function specified in \code{model_fun}.}
 should be used for fitting (omitting the \code{stan_} prefix) such as \code{"glm"} or
 \code{"lmer"}.}
 
-\item{...}{further arguments passed to the specified \code{rstanarm::stan_}
-function.}
+\item{...}{further arguments passed to the \code{rstanarm} function used for
+fitting. Typical arguments are \code{prior}, \code{prior_intercept}, \code{chain}, \code{iter},
+or \code{core}.}
 
 \item{check_contrasts}{\code{character} string (of length 1) denoting a contrast
 function which should be assigned to all \code{character} and \code{factor} variables

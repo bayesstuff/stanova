@@ -23,7 +23,9 @@ function which should be assigned to all \code{character} and \code{factor} vari
 in the model (as long as the specified contrast is not the global default).
 Default is \link{contr.bayes}. Set to \code{NULL} to disable the check.}
 
-\item{...}{further arguments passed to \code{rstanarm::stan_glm}.}
+\item{...}{further arguments passed to the \code{rstanarm} function used for
+fitting. Typical arguments are \code{prior}, \code{prior_intercept}, \code{chain}, \code{iter},
+or \code{core}.}
 
 \item{family}{\code{family} argument passed to \code{stan_glm} (set to \code{"gaussian"} for
 \code{stanova_lm} and \code{stanova_aov}).}
