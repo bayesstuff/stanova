@@ -13,7 +13,7 @@ Passed to the \code{rstanarm::stan_} function specified in \code{model_fun}.}
 \item{data}{\code{data.frame} containing the data.}
 
 \item{model_fun}{character string identifying the \code{rstanarm} function that
-should be used for fitting (omitting the \code{stan_} prefix) such as \code{"lm"} or
+should be used for fitting (omitting the \code{stan_} prefix) such as \code{"glm"} or
 \code{"lmer"}.}
 
 \item{...}{further arguments passed to the specified \code{rstanarm::stan_}
@@ -22,7 +22,7 @@ function.}
 \item{check_contrasts}{\code{character} string (of length 1) denoting a contrast
 function which should be assigned to all \code{character} and \code{factor} variables
 in the model (as long as the specified contrast is not the global default).
-Default is \link{contr.bayes}.}
+Default is \link{contr.bayes}. Set to \code{NULL} to disable the check.}
 }
 \description{
 Estimate ANOVA-type models with rstanarm
@@ -30,7 +30,8 @@ Estimate ANOVA-type models with rstanarm
 \examples{
 
 fit_warp <- stanova(breaks ~ wool * tension, data = warpbreaks,
-                    prior = rstanarm::R2(0.5), model_fun = "lm",
+                    prior = rstanarm::student_t(3, 0, 3, autoscale = FALSE),
+                    model_fun = "glm",
                     chains = 2, iter = 500)
 summary(fit_warp)
 
@@ -39,7 +40,7 @@ summary(fit_warp)
 data("Machines", package = "MEMSS")
 
 ## note: model_fun = "lmer" only works after library("rstanarm")
-## but you can simply use model_fun = "lmer" with family = "gaussian"
+## but you can simply use model_fun = "glmer" with family = "gaussian"
 m_machines <- stanova(score ~ Machine + (Machine|Worker),
                       model_fun = "glmer", family = "gaussian",
                       data=Machines, chains = 2, iter = 500)

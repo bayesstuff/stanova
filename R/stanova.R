@@ -6,11 +6,11 @@
 #' @param check_contrasts `character` string (of length 1) denoting a contrast
 #'   function which should be assigned to all `character` and `factor` variables
 #'   in the model (as long as the specified contrast is not the global default).
-#'   Default is [contr.bayes].
+#'   Default is [contr.bayes]. Set to `NULL` to disable the check.
 #' @param ... further arguments passed to the specified `rstanarm::stan_`
 #'   function.
 #' @param model_fun character string identifying the `rstanarm` function that
-#'   should be used for fitting (omitting the `stan_` prefix) such as `"lm"` or
+#'   should be used for fitting (omitting the `stan_` prefix) such as `"glm"` or
 #'   `"lmer"`.
 #'
 #' @example examples/examples.stanova.R

@@ -1,6 +1,7 @@
 
 fit_warp <- stanova(breaks ~ wool * tension, data = warpbreaks,
-                    prior = rstanarm::R2(0.5), model_fun = "lm",
+                    prior = rstanarm::student_t(3, 0, 3, autoscale = FALSE),
+                    model_fun = "glm",
                     chains = 2, iter = 500)
 summary(fit_warp)
 
@@ -9,7 +10,7 @@ summary(fit_warp)
 data("Machines", package = "MEMSS")
 
 ## note: model_fun = "lmer" only works after library("rstanarm")
-## but you can simply use model_fun = "lmer" with family = "gaussian"
+## but you can simply use model_fun = "glmer" with family = "gaussian"
 m_machines <- stanova(score ~ Machine + (Machine|Worker),
                       model_fun = "glmer", family = "gaussian",
                       data=Machines, chains = 2, iter = 500)
