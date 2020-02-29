@@ -29,9 +29,10 @@ stanova <- function(
     data <- check_contrasts(formula = formula, data = data,
                             new_contrast = check_contrasts)
   }
-  call["model_fun"] <- NULL
 
-  call[["data"]] <- data
+  ## make call nicer for returned object
+  call[[1]] <- str2lang("stanova")
+
   mout <-  do.call(
     what = getExportedValue("rstanarm",paste0("stan_", model_fun)),
     args = c(
