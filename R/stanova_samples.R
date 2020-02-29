@@ -75,18 +75,6 @@ stanova_samples.stanova <- function(
       out[[i]] <- tmp_arr
       attr(out[[i]], "estimate") <- type_est
     }
-
-    # ### extract samples as matrices
-    #
-    # ## extract intercept and concatenate chains
-    # post_intercept <- as.matrix(object, pars = "(Intercept)")
-    #
-    # post_diff <- lapply(term2, function(x) {
-    #   ## extract samples per factor-level or design cell and concatenate chains
-    #   tmp <- as.matrix(coda::as.mcmc(emmeans::emmeans(object, x)))
-    #   ## calculate difference from intercept
-    #   tmp - post_intercept[,1]
-    # })
   }
 
   if (return == "data.frame") {
