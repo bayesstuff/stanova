@@ -32,3 +32,17 @@ use_test("single_chain")
 use_roxygen_md()
 use_readme_rmd()
 use_travis()
+
+
+
+### still fails (due to emmeans):
+
+# ## beta regression (fails somehow)
+# data("GasolineYield", package = "betareg")
+# str(GasolineYield)
+#
+# fit_beta <- stanova(yield ~ batch + temp, data = GasolineYield,
+#                     model_fun = "betareg",
+#                     link = "logit", link.phi = "log",
+#                     chains = 2, iter = 500)
+# summary(fit_beta)
