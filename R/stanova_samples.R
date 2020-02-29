@@ -9,8 +9,10 @@
 #' @param return `character` string denoting format in which samples should be
 #'   returned. Allowed values are
 #'   `c("array", "matrix", "data.frame", "tibble", "tidybayes")`,
-#'   possibly abbreviated.
-#'   `"tibble"` requires package `tibble`.
+#'   possibly abbreviated. `"tibble"` requires package `tibble` and returns the
+#'   same object as `data.frame` wrapped into `as_tibble()`. `"tidybayes"` also
+#'   returns essentially the same object, but renames the columns to follow
+#'   `tidybayes` conventions.
 #' @param dimension_chain Scalar integer. If `return = "array"`, determines the
 #'   dimension of the chain. The default `3` means chain is the third dimension
 #'   of the returned array. Value should be between 1 and 3.

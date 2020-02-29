@@ -31,8 +31,10 @@ which difference from intercept be returned.}
 \item{return}{\code{character} string denoting format in which samples should be
 returned. Allowed values are
 \code{c("array", "matrix", "data.frame", "tibble", "tidybayes")},
-possibly abbreviated.
-\code{"tibble"} requires package \code{tibble}.}
+possibly abbreviated. \code{"tibble"} requires package \code{tibble} and returns the
+same object as \code{data.frame} wrapped into \code{as_tibble()}. \code{"tidybayes"} also
+returns essentially the same object, but renames the columns to follow
+\code{tidybayes} conventions.}
 
 \item{dimension_chain}{Scalar integer. If \code{return = "array"}, determines the
 dimension of the chain. The default \code{3} means chain is the third dimension

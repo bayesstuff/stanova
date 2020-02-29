@@ -45,6 +45,12 @@ if (require("tidybayes") && require("tidyverse")) {
     stat_intervalh() +
     facet_wrap(vars(term), scales = "free")
 
+   ## marginal means instead of differences from mean:
+   stanova_samples(fit_warp, return = "tidybayes", diff_intercept = FALSE) %>%
+     bind_rows() %>%
+     ggplot(aes(y = variable, x = value)) +
+     stat_halfeyeh() +
+     facet_wrap(vars(term), scales = "free")
 }
 
 

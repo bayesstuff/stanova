@@ -22,13 +22,19 @@ test_that("stanova_samples return behaviour", {
   df <- stanova_samples(mod, return = "data.frame")
   expect_is(df, "list")
   expect_is(df[[2]], "data.frame")
-  expect_equal(dim(df$`wool:tension`), c(post_samp * chains * 6, 4))
+  expect_equal(dim(df$`wool:tension`), c(post_samp * chains * 6, 6))
 
   testthat::skip_if_not_installed("tibble")
 
   tbl <- stanova_samples(mod, return = "tibble")
   expect_is(tbl, "list")
   expect_is(tbl[[2]], "tbl_df")
-  expect_equal(dim(tbl$`wool:tension`), c(post_samp * chains * 6, 4))
+  expect_equal(dim(tbl$`wool:tension`), c(post_samp * chains * 6, 6))
+
+
+  tbl2 <- stanova_samples(mod, return = "tidybayes")
+  expect_is(tbl2, "list")
+  expect_is(tbl2[[2]], "tbl_df")
+  expect_equal(dim(tbl2$`wool:tension`), c(post_samp * chains * 6, 6))
 
 })
