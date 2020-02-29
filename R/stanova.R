@@ -9,7 +9,9 @@
 #'   Default is [contr.bayes]. Set to `NULL` to disable the check.
 #' @param ... further arguments passed to the `rstanarm` function used for
 #'   fitting. Typical arguments are `prior`, `prior_intercept`, `chain`, `iter`,
-#'   or `core`.
+#'   or `core`. Ensure that arguments that cannot be evaluated in the given
+#'   context (e.g., `weight` arguments to binomial models in which only an
+#'   unquoted column name is passed) are enclosed in `quote()`.
 #' @param model_fun character string identifying the `rstanarm` function that
 #'   should be used for fitting (omitting the `stan_` prefix) such as `"glm"` or
 #'   `"lmer"`.

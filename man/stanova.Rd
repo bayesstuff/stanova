@@ -18,7 +18,9 @@ should be used for fitting (omitting the \code{stan_} prefix) such as \code{"glm
 
 \item{...}{further arguments passed to the \code{rstanarm} function used for
 fitting. Typical arguments are \code{prior}, \code{prior_intercept}, \code{chain}, \code{iter},
-or \code{core}.}
+or \code{core}. Ensure that arguments that cannot be evaluated in the given
+context (e.g., \code{weight} arguments to binomial models in which only an
+unquoted column name is passed) are enclosed in \code{quote()}.}
 
 \item{check_contrasts}{\code{character} string (of length 1) denoting a contrast
 function which should be assigned to all \code{character} and \code{factor} variables

@@ -22,7 +22,9 @@ Default is \link{contr.bayes}. Set to \code{NULL} to disable the check.}
 
 \item{...}{further arguments passed to the \code{rstanarm} function used for
 fitting. Typical arguments are \code{prior}, \code{prior_intercept}, \code{chain}, \code{iter},
-or \code{core}.}
+or \code{core}. Ensure that arguments that cannot be evaluated in the given
+context (e.g., \code{weight} arguments to binomial models in which only an
+unquoted column name is passed) are enclosed in \code{quote()}.}
 
 \item{family}{\code{family} argument passed to \code{stan_glmer}.}
 }
