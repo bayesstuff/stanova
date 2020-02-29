@@ -28,6 +28,7 @@ stanova <- function(
                             new_contrast = check_contrasts)
   }
   call["check_contrasts"] <- NULL
+  call["model_fun"] <- NULL
 
   call[[1]] <- getFromNamespace(paste0("stan_", model_fun), ns = "rstanarm")
   call[["data"]] <- data

@@ -167,25 +167,13 @@ safe_get_stanova_samples <- function(term, object, diff_intercept,
     intercept_array = intercept_array,
     dimension_chain = dimension_chain
   ), error = function(e) {
+    warning(term, ": ", e, call. = FALSE)
     nn <- as.list(rep(list(NULL), 3))
     names(nn) <- names(dimnames(intercept_array))
     tmp <- array(NA_real_, dim = c(0, 0, 0), dimnames = nn)
     attr(tmp, "estimate") <- "failed"
     return(tmp)
   }
-  )
-}
-
-safe_get_stanova_samples2 <- function(term, object, diff_intercept,
-                                intercept_array,
-                                dimension_chain) {
-  tryCatch(get_stanova_samples(
-    term = term,
-    object = object,
-    diff_intercept = diff_intercept,
-    intercept_array = intercept_array,
-    dimension_chain = dimension_chain
-  ), error = function(e) list()
   )
 }
 

@@ -19,9 +19,9 @@ summary.stanova <- function(object,
   })
 
   ## get diagnostics:
-  array_diff <- stanova_samples(object,
+  array_diff <- suppressWarnings(stanova_samples(object,
                                 diff_intercept = diff_intercept,
-                                return = "array")
+                                return = "array"))
   rhat <- lapply(
     array_diff,
     function(x)
