@@ -4,8 +4,8 @@ test_that("stanova_samples return behaviour", {
   post_samp <- 250
   capture.output(
     mod <- stanova(breaks ~ wool * tension, data = warpbreaks,
-                    prior = rstanarm::R2(0.5),
-                   model_fun = "lm",
+                    prior = rstanarm::student_t(10, 0, 5, autoscale = FALSE),
+                   model_fun = "glm",
                    chains = chains, cores = 1,
                    seed = 12345, iter = post_samp*2)
   )

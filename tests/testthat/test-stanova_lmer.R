@@ -19,11 +19,11 @@ test_that("stanova_lmer basics", {
 test_that("binomial stanova_glmer", {
   skip_if_not_installed("lme4")
   cbpp <- lme4::cbpp
-  cbpp$prob <- with(cbpp, incidence / size)
+  cbpp$prob <- cbpp$incidence / cbpp$size
   capture.output(
     example_model <- stanova_glmer(prob ~ period + (1|herd),
                                    data = cbpp, family = binomial,
-                                   weight = size,
+                                   weight = quote(size),
                                    chains = 2, cores = 1,
                                    seed = 12345, iter = 500)
   )

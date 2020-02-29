@@ -4,6 +4,7 @@ load_all()
 document()
 
 library("testthat")
+test()
 
 ### basic package things
 usethis::use_build_ignore("development.R")
@@ -19,7 +20,7 @@ use_package("MEMSS", type = "Suggests")
 use_package("afex", type = "Suggests")
 use_package("glmmTMB", type = "Suggests")
 use_package("bayesplot", type = "Suggests")
-use_package("tidybayes", type = "Suggests")
+use_package("tidyverse", type = "Suggests")
 use_test("stanova_samples")
 
 library(usethis)

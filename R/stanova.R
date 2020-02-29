@@ -29,13 +29,16 @@ stanova <- function(
     data <- check_contrasts(formula = formula, data = data,
                             new_contrast = check_contrasts)
   }
-  call["check_contrasts"] <- NULL
   call["model_fun"] <- NULL
 
-  call[[1]] <- str2lang(paste0("rstanarm::stan_", model_fun))
-  #call[[1]] <- getFromNamespace(paste0("stan_", model_fun), ns = "rstanarm")
   call[["data"]] <- data
-  mout <- eval(call)
+  mout <-  do.call(
+    what = getExportedValue("rstanarm",paste0("stan_", model_fun)),
+    args = c(
+      formula = formula,
+      data = list(data),
+      list(...)
+    ))
   mout$call <- call
   mout$stan_function <- paste0("stanova_", model_fun)
   class(mout) <- c("stanova", class(mout))

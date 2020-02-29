@@ -35,4 +35,5 @@ Suggests:
     glmmTMB,
     bayesplot,
     tibble,
-    tidybayes
+    tidybayes,
+    tidyverse
