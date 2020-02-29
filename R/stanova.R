@@ -34,6 +34,7 @@ stanova <- function(
 
   ## make call nicer for returned object
   call[[1]] <- str2lang("stanova")
+  call[["data"]] <- data
 
   mout <-  do.call(
     what = getExportedValue("rstanarm",paste0("stan_", model_fun)),
