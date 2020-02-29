@@ -7,7 +7,14 @@ summary(m1)
 fit_warp <- stanova(breaks ~ wool * tension, data = warpbreaks, prior = R2(0.5))
 summary(fit_warp)
 
+####
 
+data("Machines", package = "MEMSS")
+
+m_machines <- stanova(score ~ Machine + (Machine|Worker),
+                      model_fun = "lmer",
+                      data=Machines, chains = 2, iter = 500)
+summary(m_machines)
 
 ## negative binomial
 fit6a <- stanova(Days ~ Sex/(Age + Eth*Lrn), data = MASS::quine,
