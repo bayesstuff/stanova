@@ -40,6 +40,7 @@ stanova_glmer <- function(
     formula = formula,
     data = data,
     model_fun = "glmer",
+    family = family,
     ...,
     check_contrasts = check_contrasts
   )
