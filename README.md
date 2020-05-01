@@ -19,19 +19,20 @@ The issue `stanova` tries to address is that categorical variables with
 coefficients. This poses a problem if a model includes a factor with
 more than two levels that interacts with another variable. In this case,
 the most reasonable parameterization of the model is such that the
-intercept correspond to the (unweighted) grand mean and therefore tests
-of main effects represent average effects (compared to simple effects).
-In this parameterization, factors with \(k\) levels, where \(k > 2\)
-(i.e., more than two levels), cannot be mapped in a 1-to-1 fashion to
-the \(k-1\) coefficients as no such mapping exists. Thus, the values of
-the model coefficients do not represent effects of one factor level, but
-always pertain to more than one factor level and thus cannot be directly
-interpreted. In other words, these coefficients should not be looked at.
-Instead, `stanova` transforms these parameters back such that one gets
-the information on the factor levels (or combination of factor levels
-for interactions). The default output shows for each factor level the
-difference from the intercept which as discussed before corresponds to
-the (unweighted) grand mean.
+intercept correspond to the (unweighted) grand mean and therefore
+estimates of the coefficients for the main effects represent average
+effects (compared to simple effects). In this parameterization, factors
+with \(k\) levels, where \(k > 2\) (i.e., more than two levels), cannot
+be mapped in a 1-to-1 fashion to the \(k-1\) coefficients as no such
+mapping exists. Thus, the estimates of the model coefficients do not
+represent effects of one factor level, but always pertain to more than
+one factor level and thus cannot be directly interpreted. In other
+words, these coefficients should not be looked at. Instead, `stanova`
+transforms these parameters back such that one gets the information on
+the factor levels (or combination of factor levels for interactions).
+The default output shows for each factor level the difference from the
+intercept which as discussed before corresponds to the (unweighted)
+grand mean.
 
 Another problem adressed by `stanova` is that for Bayesian models the
 mapping of factor-levels to model coefficients needs to be done such
@@ -43,12 +44,12 @@ marginal prior differs across factor levels. For example, when using
 model coefficient with positive sign, and the last factor level is
 mapped with negative sign on all model coefficients. Thus, the marginal
 prior for the last factor level is more diffuse than for the other
-factor levels (if \(k >2\)). `stanova` per default uses the prior
-suggested by Rouder, Morey, Speckman, and Province (2012) in which the
-marginal prior is the same for all factor levels. In this prior, the
-sum-to-zero constraint that is necessary for the intercept to represent
-the (unweighted) grand mean is also imposed. This contrast is
-implemented in the `contr.bayes()` function.
+factor levels (if \(k >2\)). `stanova` per default uses the contrast
+coding scheme suggested by Rouder, Morey, Speckman, and Province (2012)
+which is such that the marginal prior is the same for all factor levels.
+When using this contrast, the sum-to-zero constraint that is necessary
+for the intercept to represent the (unweighted) grand mean is also
+imposed. This contrast is implemented in the `contr.bayes()` function.
 
 ## Installation
 
@@ -97,15 +98,15 @@ summary(m_machines)
 #>  groups:       Worker (6)
 #> 
 #> Estimate Intercept:
-#>      Variable Mean MAD_SD   5%  50%  95% rhat ess_bulk ess_tail
-#> 1 (Intercept) 59.3    1.9 56.3 59.5 62.2    1      159      271
+#>      Variable Mean MAD_SD   5%  50% 95% rhat ess_bulk ess_tail
+#> 1 (Intercept) 59.5      2 56.3 59.5  63 1.02      101      134
 #> 
 #> 
 #> Estimates 'Machine' - difference from intercept:
 #>    Variable   Mean MAD_SD    5%    50%   95% rhat ess_bulk ess_tail
-#> 1 Machine A -7.314   1.20 -9.48 -7.285 -5.46 1.00      255      228
-#> 2 Machine B  0.646   1.25 -1.47  0.667  2.86 1.01      162      207
-#> 3 Machine C  6.668   1.21  4.57  6.693  8.71 1.01      224      267
+#> 1 Machine A -7.270   1.22 -9.23 -7.347 -5.11 1.00      188      318
+#> 2 Machine B  0.518   1.33 -1.68  0.464  2.87 1.02      145      262
+#> 3 Machine C  6.751   1.18  4.62  6.746  9.00 1.00      240      241
 ```
 
 If one is not interested in the differences from the factor levels, it
@@ -127,15 +128,15 @@ summary(m_machines, diff_intercept = FALSE)
 #>  groups:       Worker (6)
 #> 
 #> Estimate Intercept:
-#>      Variable Mean MAD_SD   5%  50%  95% rhat ess_bulk ess_tail
-#> 1 (Intercept) 59.3    1.9 56.3 59.5 62.2    1      159      271
+#>      Variable Mean MAD_SD   5%  50% 95% rhat ess_bulk ess_tail
+#> 1 (Intercept) 59.5      2 56.3 59.5  63 1.02      101      134
 #> 
 #> 
 #> Estimates 'Machine' - marginal means:
-#>    Variable Mean MAD_SD   5%  50%  95%  rhat ess_bulk ess_tail
-#> 1 Machine A   52   1.71 49.0 52.1 55.1 1.003      212      314
-#> 2 Machine B   60   2.97 55.6 60.2 64.1 1.003      144      191
-#> 3 Machine C   66   1.73 62.6 66.0 69.3 0.997      201      272
+#>    Variable Mean MAD_SD   5%  50%  95% rhat ess_bulk ess_tail
+#> 1 Machine A 52.3   1.88 48.9 52.3 55.5 1.01      127      196
+#> 2 Machine B 60.1   2.89 55.1 60.1 65.3 1.02      101      145
+#> 3 Machine C 66.3   2.00 62.8 66.3 69.8 1.01      156      143
 ```
 
 The key to the output is the `stanova_samples()` function which takes a
@@ -149,12 +150,12 @@ the `return` argument.
 out_array <- stanova_samples(m_machines)
 str(out_array)
 #> List of 2
-#>  $ (Intercept): num [1:250, 1, 1:2] 57.7 59.9 60.6 61.2 59.6 ...
+#>  $ (Intercept): num [1:250, 1, 1:2] 58.4 58.8 60.4 61.3 59.6 ...
 #>   ..- attr(*, "dimnames")=List of 3
 #>   .. ..$ Iteration: chr [1:250] "1" "2" "3" "4" ...
 #>   .. ..$ Parameter: chr "(Intercept)"
 #>   .. ..$ Chain    : chr [1:2] "chain:1" "chain:2"
-#>  $ Machine    : num [1:250, 1:3, 1:2] -6.38 -8.17 -7.86 -8.12 -7.63 ...
+#>  $ Machine    : num [1:250, 1:3, 1:2] -6.25 -6.76 -7.36 -7.27 -7.28 ...
 #>   ..- attr(*, "dimnames")=List of 3
 #>   .. ..$ Iteration: chr [1:250] "1" "2" "3" "4" ...
 #>   .. ..$ Parameter: chr [1:3] "Machine A" "Machine B" "Machine C"
@@ -169,12 +170,12 @@ via the `dimension_chain` argument.
 out_array2 <- stanova_samples(m_machines, dimension_chain = 2)
 str(out_array2)
 #> List of 2
-#>  $ (Intercept): num [1:250, 1:2, 1] 57.7 59.9 60.6 61.2 59.6 ...
+#>  $ (Intercept): num [1:250, 1:2, 1] 58.4 58.8 60.4 61.3 59.6 ...
 #>   ..- attr(*, "dimnames")=List of 3
 #>   .. ..$ Iteration: chr [1:250] "1" "2" "3" "4" ...
 #>   .. ..$ Chain    : chr [1:2] "chain:1" "chain:2"
 #>   .. ..$ Parameter: chr "(Intercept)"
-#>  $ Machine    : num [1:250, 1:2, 1:3] -6.38 -8.17 -7.86 -8.12 -7.63 ...
+#>  $ Machine    : num [1:250, 1:2, 1:3] -6.25 -6.76 -7.36 -7.27 -7.28 ...
 #>   ..- attr(*, "dimnames")=List of 3
 #>   .. ..$ Iteration: chr [1:250] "1" "2" "3" "4" ...
 #>   .. ..$ Chain    : chr [1:2] "chain:1" "chain:2"
