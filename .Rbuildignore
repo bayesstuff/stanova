@@ -2,5 +2,6 @@
 ^\.Rproj\.user$
 ^development\.R$
 ^examples$
+^development$
 ^README\.Rmd$
 ^\.travis\.yml$
