@@ -16,16 +16,11 @@ stanova_lmer <- function(
   data,
   check_contrasts = "contr.bayes",
   ...) {
-  out <- stanova(
-    formula = formula,
-    data = data,
-    model_fun = "glmer",
-    family = "gaussian",
-    ...,
-    check_contrasts = check_contrasts
-  )
-  out$stan_function <- "stanova_lmer"
-  return(out)
+  mc <- match.call()
+  mc[[1]] <- quote(stanova)
+  mc[["model_fun"]] <- "glmer"
+  mc[["family"]] <- "gaussian"
+  eval.parent(mc)
 }
 
 #' @rdname stanova_lmer
@@ -36,13 +31,9 @@ stanova_glmer <- function(
   family,
   check_contrasts = "contr.bayes",
   ...) {
-  stanova(
-    formula = formula,
-    data = data,
-    model_fun = "glmer",
-    family = family,
-    ...,
-    check_contrasts = check_contrasts
-  )
+  mc <- match.call()
+  mc[[1]] <- quote(stanova)
+  mc[["model_fun"]] <- "glmer"
+  eval.parent(mc)
 }
 

@@ -18,16 +18,11 @@ stanova_lm <- function(
   data,
   check_contrasts = "contr.bayes",
   ...) {
-  out <- stanova(
-    formula = formula,
-    data = data,
-    model_fun = "glm",
-    family = "gaussian",
-    ...,
-    check_contrasts = check_contrasts
-  )
-  out$stan_function <- "stanova_lm"
-  return(out)
+  mc <- match.call()
+  mc[[1]] <- quote(stanova)
+  mc[["model_fun"]] <- "glm"
+  mc[["family"]] <- "gaussian"
+  eval.parent(mc)
 }
 
 #' @rdname stanova_lm
@@ -42,13 +37,9 @@ stanova_glm <- function(
   family,
   check_contrasts = "contr.bayes",
   ...) {
-  stanova(
-    formula = formula,
-    data = data,
-    model_fun = "glm",
-    family = family,
-    ...,
-    check_contrasts = check_contrasts
-  )
+  mc <- match.call()
+  mc[[1]] <- quote(stanova)
+  mc[["model_fun"]] <- "glm"
+  eval.parent(mc)
 }
 
