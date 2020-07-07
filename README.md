@@ -7,6 +7,8 @@
 
 [![Travis build
 status](https://travis-ci.org/bayesstuff/stanova.svg?branch=master)](https://travis-ci.org/bayesstuff/stanova)
+[![R build
+status](https://github.com/bayesstuff/stanova/workflows/R-CMD-check/badge.svg)](https://github.com/bayesstuff/stanova/actions)
 <!-- badges: end -->
 
 The goal of `stanova` is to provide a more relevant and interpretable
@@ -102,15 +104,15 @@ summary(m_machines)
 #>  groups:       Worker (6)
 #> 
 #> Estimate Intercept:
-#>      Variable Mean MAD_SD   5%  50%  95% rhat ess_bulk ess_tail
-#> 1 (Intercept) 59.5   1.79 55.8 59.5 62.9 1.01      361      486
+#>      Variable Mean MAD_SD   5%  50% 95% rhat ess_bulk ess_tail
+#> 1 (Intercept) 59.6   1.95 56.3 59.5  63 1.01      319      441
 #> 
 #> 
 #> Estimates 'Machine' - difference from intercept:
 #>    Variable   Mean MAD_SD    5%    50%   95% rhat ess_bulk ess_tail
-#> 1 Machine A -7.257   1.18 -9.35 -7.244 -5.13 1.01      378      525
-#> 2 Machine B  0.603   1.31 -1.73  0.545  2.91 1.00      378      523
-#> 3 Machine C  6.654   1.20  4.40  6.655  8.88 1.01      345      304
+#> 1 Machine A -7.297   1.29 -9.51 -7.271 -5.01    1      526      559
+#> 2 Machine B  0.663   1.39 -1.65  0.666  3.02    1      403      466
+#> 3 Machine C  6.635   1.28  4.36  6.637  8.77    1      477      445
 ```
 
 If one is not interested in the differences from the factor levels, it
@@ -132,15 +134,15 @@ summary(m_machines, diff_intercept = FALSE)
 #>  groups:       Worker (6)
 #> 
 #> Estimate Intercept:
-#>      Variable Mean MAD_SD   5%  50%  95% rhat ess_bulk ess_tail
-#> 1 (Intercept) 59.5   1.79 55.8 59.5 62.9 1.01      361      486
+#>      Variable Mean MAD_SD   5%  50% 95% rhat ess_bulk ess_tail
+#> 1 (Intercept) 59.6   1.95 56.3 59.5  63 1.01      319      441
 #> 
 #> 
 #> Estimates 'Machine' - marginal means:
 #>    Variable Mean MAD_SD   5%  50%  95% rhat ess_bulk ess_tail
-#> 1 Machine A 52.2   1.84 48.8 52.3 55.5 1.00      415      536
-#> 2 Machine B 60.1   2.71 55.0 60.1 65.0 1.01      363      455
-#> 3 Machine C 66.1   1.78 62.5 66.2 69.5 1.02      307      417
+#> 1 Machine A 52.3   1.82 48.8 52.2 55.7 1.00      408      445
+#> 2 Machine B 60.2   2.93 55.4 60.3 65.0 1.00      310      424
+#> 3 Machine C 66.2   1.95 62.6 66.2 69.6 1.01      334      425
 ```
 
 The key to the output is the `stanova_samples()` function which takes a
@@ -154,12 +156,12 @@ the `return` argument.
 out_array <- stanova_samples(m_machines)
 str(out_array)
 #> List of 2
-#>  $ (Intercept): num [1:500, 1, 1:2] 63.5 59.7 58.6 59.1 58.4 ...
+#>  $ (Intercept): num [1:500, 1, 1:2] 57.9 59 55.3 61.5 60.6 ...
 #>   ..- attr(*, "dimnames")=List of 3
 #>   .. ..$ Iteration: chr [1:500] "1" "2" "3" "4" ...
 #>   .. ..$ Parameter: chr "(Intercept)"
 #>   .. ..$ Chain    : chr [1:2] "chain:1" "chain:2"
-#>  $ Machine    : num [1:500, 1:3, 1:2] -7.34 -7.39 -6.76 -7.75 -6.66 ...
+#>  $ Machine    : num [1:500, 1:3, 1:2] -7.48 -6.92 -8.8 -6.41 -6.04 ...
 #>   ..- attr(*, "dimnames")=List of 3
 #>   .. ..$ Iteration: chr [1:500] "1" "2" "3" "4" ...
 #>   .. ..$ Parameter: chr [1:3] "Machine A" "Machine B" "Machine C"
@@ -174,12 +176,12 @@ via the `dimension_chain` argument.
 out_array2 <- stanova_samples(m_machines, dimension_chain = 2)
 str(out_array2)
 #> List of 2
-#>  $ (Intercept): num [1:500, 1:2, 1] 63.5 59.7 58.6 59.1 58.4 ...
+#>  $ (Intercept): num [1:500, 1:2, 1] 57.9 59 55.3 61.5 60.6 ...
 #>   ..- attr(*, "dimnames")=List of 3
 #>   .. ..$ Iteration: chr [1:500] "1" "2" "3" "4" ...
 #>   .. ..$ Chain    : chr [1:2] "chain:1" "chain:2"
 #>   .. ..$ Parameter: chr "(Intercept)"
-#>  $ Machine    : num [1:500, 1:2, 1:3] -7.34 -7.39 -6.76 -7.75 -6.66 ...
+#>  $ Machine    : num [1:500, 1:2, 1:3] -7.48 -6.92 -8.8 -6.41 -6.04 ...
 #>   ..- attr(*, "dimnames")=List of 3
 #>   .. ..$ Iteration: chr [1:500] "1" "2" "3" "4" ...
 #>   .. ..$ Chain    : chr [1:2] "chain:1" "chain:2"
