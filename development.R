@@ -34,6 +34,7 @@ use_test("single_chain")
 use_roxygen_md()
 use_readme_rmd()
 use_travis()
+use_github_action_check_standard()
 
 
 

@@ -5,3 +5,4 @@
 ^development$
 ^README\.Rmd$
 ^\.travis\.yml$
+^\.github$
