@@ -44,8 +44,10 @@ create_contrasts_list <- function(formula, data, new_contrast) {
     }
   }
   if (!is.null(resetted))
-    message(paste0("Contrasts set to ", new_contrast," for the following variables: ",
+    message(paste0("Contrasts set to ", new_contrast,
+                   " for the following variables: ",
                    paste0(resetted, collapse=", ")))
+  if (length(outlist) == 0) outlist <- NULL
   return(outlist)
 }
 

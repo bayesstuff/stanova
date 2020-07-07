@@ -25,9 +25,7 @@ Default is \link{contr.bayes}. Set to \code{NULL} to disable the check.}
 
 \item{...}{further arguments passed to the \code{rstanarm} function used for
 fitting. Typical arguments are \code{prior}, \code{prior_intercept}, \code{chain}, \code{iter},
-or \code{core}. Ensure that arguments that cannot be evaluated in the given
-context (e.g., \code{weight} arguments to binomial models in which only an
-unquoted column name is passed) are enclosed in \code{quote()}.}
+or \code{core}.}
 
 \item{family}{\code{family} argument passed to \code{stan_glm} (set to \code{"gaussian"} for
 \code{stanova_lm} and \code{stanova_aov}).}
@@ -43,7 +41,7 @@ are only wrappers around \code{\link{stanova}} setting \code{model_fun} to \code
 \examples{
 
 fit_warp <- stanova_lm(breaks ~ wool * tension, data = warpbreaks,
-                    prior = rstanarm::student_t(3, 0, 3, autoscale = FALSE),
+                    prior = rstanarm::student_t(3, 0, 20, autoscale = FALSE),
                     chains = 2, iter = 500)
 summary(fit_warp)
 

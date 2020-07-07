@@ -26,14 +26,16 @@ stanova <- function(
   call <- match.call()
   orig_call <- call
 
-  if (model_fun == "lm") {
-    message('model_fun = "lm" replaced with model_fun = "glm"')
-    model_fun = "glm"
-    call[["family"]] <- "gaussian"
-  }
+  # if (model_fun == "lm") {
+  #   message('model_fun = "lm" replaced with model_fun = "glm"')
+  #   model_fun = "glm"
+  #   call[["family"]] <- "gaussian"
+  # }
 
   if (!is.null(check_contrasts)) {
-    contrasts_list <- create_contrasts_list(formula = formula, data = data,
+    # contrasts_list <- create_contrasts_list(formula = formula, data = data,
+    #                         new_contrast = check_contrasts)
+    data <- check_contrasts(formula = formula, data = data,
                             new_contrast = check_contrasts)
   }
 
@@ -44,7 +46,10 @@ stanova <- function(
   if ("check_contrasts" %in% names(call)) {
     call[["check_contrasts"]] <- NULL
   }
-  call[["contrasts"]] <- contrasts_list
+  # if (!is.null(contrasts_list)) {
+  #   call[["contrasts"]] <- contrasts_list
+  # }
+  call[["data"]] <- data
   mout <- eval.parent(call)
 
   ## prepare output object

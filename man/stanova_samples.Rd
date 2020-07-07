@@ -75,27 +75,27 @@ if (require("tidybayes") && require("tidyverse")) {
     group_by(variable) \%>\%
     median_qi(value) \%>\%
     ggplot(aes(y = variable, x = value, xmin = .lower, xmax = .upper)) +
-    geom_pointintervalh()
+    geom_pointinterval()
 
   tidy_warp$tension \%>\%
     ggplot(aes(y = variable, x = value)) +
-    stat_halfeyeh()
+    stat_halfeye()
 
   bind_rows(tidy_warp) \%>\%
     ggplot(aes(y = variable, x = value)) +
-    stat_halfeyeh() +
+    stat_halfeye() +
     facet_wrap(vars(term), scales = "free")
 
    bind_rows(tidy_warp) \%>\%
     ggplot(aes(y = variable, x = value)) +
-    stat_intervalh() +
+    stat_interval() +
     facet_wrap(vars(term), scales = "free")
 
    ## marginal means instead of differences from mean:
    stanova_samples(fit_warp, return = "tidybayes", diff_intercept = FALSE) \%>\%
      bind_rows() \%>\%
      ggplot(aes(y = variable, x = value)) +
-     stat_halfeyeh() +
+     stat_halfeye() +
      facet_wrap(vars(term), scales = "free")
 }
 

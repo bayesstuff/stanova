@@ -119,7 +119,7 @@ stanova_samples.stanova <- function(
 get_stanova_samples <- function(term, object, diff_intercept,
                                 intercept_array,
                                 dimension_chain) {
-  num_vars <- vapply(object[["data"]][,term], is.numeric, TRUE)
+  num_vars <- vapply(object[["data"]][,term,drop = FALSE], is.numeric, TRUE)
   if (any(num_vars)) {
     if (length(term) == 1) {
       tmp <- extract_array_rstanarm(object, pars = term)

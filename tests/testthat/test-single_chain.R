@@ -2,8 +2,10 @@ test_that("Single chains work as expected", {
   testthat::skip_if_not_installed("MEMSS")
   data("Machines", package = "MEMSS")
 
-  capture.output(m_machines_1 <- stanova_lmer(score ~ Machine + (Machine|Worker),
-                           data=Machines, chains = 1, iter = 200))
+  suppressWarnings(capture.output(
+    m_machines_1 <- stanova_lmer(score ~ Machine + (Machine|Worker),
+                                 data=Machines, chains = 1, iter = 200)
+  ))
   ar <- stanova_samples(m_machines_1, return = "array")
   expect_is(ar, "list")
   expect_length(ar, 2)

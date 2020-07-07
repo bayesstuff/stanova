@@ -5,6 +5,7 @@ document()
 
 library("testthat")
 test()
+check()
 
 ### basic package things
 usethis::use_build_ignore("development.R")
@@ -14,14 +15,14 @@ use_package("rstanarm")
 use_package("lme4")
 use_package("emmeans")
 use_package("rstan")
-use_package("stats")
+use_package("MASS")
 
 use_package("MEMSS", type = "Suggests")
 use_package("afex", type = "Suggests")
 use_package("glmmTMB", type = "Suggests")
 use_package("bayesplot", type = "Suggests")
 use_package("tidyverse", type = "Suggests")
-use_test("stanova_samples")
+use_test("stanova")
 
 library(usethis)
 

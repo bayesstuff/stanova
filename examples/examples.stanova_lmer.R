@@ -1,8 +1,14 @@
 
+### examples generally use stanova(.., model_fun = "glmer")
+## this can be replaced by the stanova_lmer or stanove_glmer
+
 data("Machines", package = "MEMSS")
 
-m_machines <- stanova_lmer(score ~ Machine + (Machine|Worker),
-                           data=Machines, chains = 2, iter = 500)
+## better formula would be: score ~ Machine + (Machine|Worker)
+m_machines <- stanova(score ~ Machine + (1|Worker),
+                      model_fun = "glmer",
+                      data=Machines, chains = 2,
+                      warmup = 250, iter = 750)
 summary(m_machines) ## default: difference from intercept
 
 summary(m_machines, diff_intercept = FALSE) ## alt: marginal means
@@ -33,13 +39,13 @@ data(md_16.4, package = "afex")
 md_16.4$cog <- scale(md_16.4$cog, scale=FALSE)
 
 
-m_cont0 <- stanova_lmer(induct ~ cog + (cog|room:cond), md_16.4,
-                        chains = 2, iter = 500)
+m_cont0 <- stanova(induct ~ cog + (cog|room:cond), md_16.4,
+                   model_fun = "glmer", chains = 2, iter = 500)
 summary(m_cont0)
 
 # with interaction:
-m_cont1 <- stanova_lmer(induct ~ cond*cog + (cog|room:cond), md_16.4,
-                        chains = 2, iter = 500)
+m_cont1 <- stanova(induct ~ cond*cog + (cog|room:cond), md_16.4,
+                   model_fun = "glmer", chains = 2, iter = 500)
 summary(m_cont1)
 
 summary(m_cont1, diff_intercept = TRUE)
@@ -49,19 +55,16 @@ summary(m_cont1, diff_intercept = TRUE)
 ## binomial model
 cbpp <- lme4::cbpp
 cbpp$prob <- with(cbpp, incidence / size)
-example_model <- stanova_glmer(prob ~ period + (1|herd),
-                            data = cbpp, family = binomial,
-                            weight = quote(size),
-                            chains = 2, cores = 1, seed = 12345, iter = 500)
-## Note: we need to quote() the weight column.
-## Alterntively passing the column directly also works: cpbb$weights
-
+example_model <- stanova(prob ~ period + (1|herd),
+                         data = cbpp, family = binomial,
+                         weight = size, model_fun = "glmer",
+                         chains = 2, cores = 1, seed = 12345, iter = 500)
 summary(example_model)
 
 
 ## poisson model
 data(Salamanders, package = "glmmTMB")
-gm1 <- stanova_glmer(count~spp * mined + (1 | site), data = Salamanders,
-                   family = "poisson",
-                   chains = 2, cores = 1, seed = 12345, iter = 500)
+gm1 <- stanova(count~spp * mined + (1 | site), data = Salamanders,
+               family = "poisson", model_fun = "glmer",
+               chains = 2, cores = 1, seed = 12345, iter = 500)
 summary(gm1)

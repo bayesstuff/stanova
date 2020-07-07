@@ -14,13 +14,11 @@ Passed to the \code{rstanarm::stan_} function specified in \code{model_fun}.}
 
 \item{model_fun}{character string identifying the \code{rstanarm} function that
 should be used for fitting (omitting the \code{stan_} prefix) such as \code{"glm"} or
-\code{"lmer"}.}
+\code{"glmer"}.}
 
 \item{...}{further arguments passed to the \code{rstanarm} function used for
 fitting. Typical arguments are \code{prior}, \code{prior_intercept}, \code{chain}, \code{iter},
-or \code{core}. Ensure that arguments that cannot be evaluated in the given
-context (e.g., \code{weight} arguments to binomial models in which only an
-unquoted column name is passed) are enclosed in \code{quote()}.}
+or \code{core}.}
 
 \item{check_contrasts}{\code{character} string (of length 1) denoting a contrast
 function which should be assigned to all \code{character} and \code{factor} variables
@@ -32,13 +30,53 @@ Estimate ANOVA-type models with rstanarm
 }
 \examples{
 
+
+#################################################################
+##                  Regular Regression Models                  ##
+#################################################################
+
+# ANOVA
 fit_warp <- stanova(breaks ~ wool * tension, data = warpbreaks,
-                    prior = rstanarm::student_t(3, 0, 3, autoscale = FALSE),
+                    prior = rstanarm::student_t(3, 0, 20, autoscale = FALSE),
                     model_fun = "glm",
                     chains = 2, iter = 500)
-summary(fit_warp)
 
-####
+summary(fit_warp) ## difference from intercept
+summary(fit_warp, diff_intercept = FALSE)  ## marginal means
+
+\dontrun{ ## for speed reasons
+## binomial model
+### from: ?predict.glm
+## example from Venables and Ripley (2002, pp. 190-2.)
+dfbin <- data.frame(
+  ldose = rep(0:5, 2),
+  numdead = c(1, 4, 9, 13, 18, 20, 0, 2, 6, 10, 12, 16),
+  sex = factor(rep(c("M", "F"), c(6, 6)))
+)
+budworm.lg <- stanova(cbind(numdead, numalive = 20-numdead) ~ sex*ldose,
+                      data = dfbin,
+                      model_fun = "glm",
+                      family = binomial,
+                      chains = 2, iter = 500)
+## note: only sex is categorical, ldose is continuous
+summary(budworm.lg)
+
+
+## negative binomial
+## requires attaching rstanarm
+library("rstanarm")
+fit6a <- stanova(Days ~ Sex/(Age + Eth*Lrn), data = MASS::quine,
+                 model_fun = "glm.nb",
+                 link = "log", prior_aux = exponential(1.5),
+                 chains = 2, iter = 200) # for speed of example only
+summary(fit6a)
+
+
+
+
+##################################################################
+##                     Mixed Effects Models                     ##
+##################################################################
 
 data("Machines", package = "MEMSS")
 
@@ -49,15 +87,25 @@ m_machines <- stanova(score ~ Machine + (Machine|Worker),
                       data=Machines, chains = 2, iter = 500)
 summary(m_machines)
 
-\dontrun{
-## negative binomial
-## requires attaching rstanarm
-library("rstanarm")
-fit6a <- stanova(Days ~ Sex/(Age + Eth*Lrn), data = MASS::quine,
-                 model_fun = "glm.nb",
-                 link = "log", prior_aux = exponential(1.5),
-                 chains = 2, iter = 200) # for speed of example only
-summary(fit6a)
+
+## binomial model
+cbpp <- lme4::cbpp
+cbpp$prob <- with(cbpp, incidence / size)
+example_model <- stanova(prob ~ period + (1|herd),
+                         data = cbpp, family = binomial,
+                         model_fun = "glmer",
+                         weight = size,
+                         chains = 2, cores = 1, seed = 12345, iter = 500)
+summary(example_model)
 }
+
+## poisson model
+data(Salamanders, package = "glmmTMB")
+gm1 <- stanova(count~spp * mined + (1 | site), data = Salamanders,
+               model_fun = "glmer", family = "poisson",
+               chains = 2, cores = 1, seed = 12345, iter = 500)
+summary(gm1)
+
+
 
 }

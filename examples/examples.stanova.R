@@ -6,11 +6,14 @@
 
 # ANOVA
 fit_warp <- stanova(breaks ~ wool * tension, data = warpbreaks,
-                    prior = rstanarm::student_t(3, 0, 3, autoscale = FALSE),
+                    prior = rstanarm::student_t(3, 0, 20, autoscale = FALSE),
                     model_fun = "glm",
                     chains = 2, iter = 500)
-summary(fit_warp)
 
+summary(fit_warp) ## difference from intercept
+summary(fit_warp, diff_intercept = FALSE)  ## marginal means
+
+\dontrun{ ## for speed reasons
 ## binomial model
 ### from: ?predict.glm
 ## example from Venables and Ripley (2002, pp. 190-2.)
@@ -27,7 +30,7 @@ budworm.lg <- stanova(cbind(numdead, numalive = 20-numdead) ~ sex*ldose,
 ## note: only sex is categorical, ldose is continuous
 summary(budworm.lg)
 
-\dontrun{
+
 ## negative binomial
 ## requires attaching rstanarm
 library("rstanarm")
@@ -36,7 +39,7 @@ fit6a <- stanova(Days ~ Sex/(Age + Eth*Lrn), data = MASS::quine,
                  link = "log", prior_aux = exponential(1.5),
                  chains = 2, iter = 200) # for speed of example only
 summary(fit6a)
-}
+
 
 
 
@@ -63,13 +66,13 @@ example_model <- stanova(prob ~ period + (1|herd),
                          weight = size,
                          chains = 2, cores = 1, seed = 12345, iter = 500)
 summary(example_model)
-
+}
 
 ## poisson model
 data(Salamanders, package = "glmmTMB")
-gm1 <- stanova_glmer(count~spp * mined + (1 | site), data = Salamanders,
-                   family = "poisson",
-                   chains = 2, cores = 1, seed = 12345, iter = 500)
+gm1 <- stanova(count~spp * mined + (1 | site), data = Salamanders,
+               model_fun = "glmer", family = "poisson",
+               chains = 2, cores = 1, seed = 12345, iter = 500)
 summary(gm1)
 
 

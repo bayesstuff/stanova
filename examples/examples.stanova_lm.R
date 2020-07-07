@@ -1,6 +1,6 @@
 
 fit_warp <- stanova_lm(breaks ~ wool * tension, data = warpbreaks,
-                    prior = rstanarm::student_t(3, 0, 3, autoscale = FALSE),
+                    prior = rstanarm::student_t(3, 0, 20, autoscale = FALSE),
                     chains = 2, iter = 500)
 summary(fit_warp)
 
