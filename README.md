@@ -11,8 +11,10 @@ status](https://travis-ci.org/bayesstuff/stanova.svg?branch=master)](https://tra
 
 The goal of `stanova` is to provide a more relevant and interpretable
 `summary` for Bayesian models with categorical covariates and possibly
-interactions. At the moment, it only provides wrappers for `rstanarm`
-via functions `stanova_lmer` and `stanova_glmer`.
+interactions. The core function is `stanova()` which requires specifying
+which `rstanarm` function should be called through argument `model_fun`
+(e.g., `model_fun = glmer` calls `stan_glmer` and allows fitting
+Bayesian mixed models).
 
 The issue `stanova` tries to address is that categorical variables with
 \(k\) levels need to be transformed into \(k-1\) numerical model
@@ -70,11 +72,13 @@ demonstrate the output.
 library(stanova)
 data("Machines", package = "MEMSS")
 
-m_machines <- stanova_lmer(score ~ Machine + (Machine|Worker),
-                           data=Machines, chains = 2, iter = 500)
+m_machines <- stanova(score ~ Machine + (Machine|Worker),
+                      model_fun = "glmer",
+                      data=Machines, chains = 2,
+                      warmup = 250, iter = 750)
 ```
 
-The `summary` method of a `staonva` objects first provides some general
+The `summary` method of a `stanova` objects first provides some general
 information about the fitted model (similar to `rstanarm`). It then
 provides statistics about the intercept. The next block provides
 estimates for each factor-level of the `Machine` factor. These estimates
@@ -87,26 +91,26 @@ grand mean).
 summary(m_machines)
 #> 
 #> Model Info:
-#>  function:     stanova_lmer
+#>  function:     stanova_glmer
 #>  family:       gaussian [identity]
 #>  formula:      score ~ Machine + (Machine | Worker)
 #>  algorithm:    sampling
 #>  chains:       2
-#>  sample:       500 (posterior sample size)
+#>  sample:       1000 (posterior sample size)
 #>  priors:       see help('prior_summary', package = 'rstanarm')
 #>  observations: 54
 #>  groups:       Worker (6)
 #> 
 #> Estimate Intercept:
-#>      Variable Mean MAD_SD   5%  50% 95% rhat ess_bulk ess_tail
-#> 1 (Intercept) 59.5      2 56.3 59.5  63 1.02      101      134
+#>      Variable Mean MAD_SD   5%  50%  95% rhat ess_bulk ess_tail
+#> 1 (Intercept) 59.5   1.79 55.8 59.5 62.9 1.01      361      486
 #> 
 #> 
 #> Estimates 'Machine' - difference from intercept:
 #>    Variable   Mean MAD_SD    5%    50%   95% rhat ess_bulk ess_tail
-#> 1 Machine A -7.270   1.22 -9.23 -7.347 -5.11 1.00      188      318
-#> 2 Machine B  0.518   1.33 -1.68  0.464  2.87 1.02      145      262
-#> 3 Machine C  6.751   1.18  4.62  6.746  9.00 1.00      240      241
+#> 1 Machine A -7.257   1.18 -9.35 -7.244 -5.13 1.01      378      525
+#> 2 Machine B  0.603   1.31 -1.73  0.545  2.91 1.00      378      523
+#> 3 Machine C  6.654   1.20  4.40  6.655  8.88 1.01      345      304
 ```
 
 If one is not interested in the differences from the factor levels, it
@@ -117,26 +121,26 @@ just needs to set `diff_intercept = FALSE`.
 summary(m_machines, diff_intercept = FALSE)
 #> 
 #> Model Info:
-#>  function:     stanova_lmer
+#>  function:     stanova_glmer
 #>  family:       gaussian [identity]
 #>  formula:      score ~ Machine + (Machine | Worker)
 #>  algorithm:    sampling
 #>  chains:       2
-#>  sample:       500 (posterior sample size)
+#>  sample:       1000 (posterior sample size)
 #>  priors:       see help('prior_summary', package = 'rstanarm')
 #>  observations: 54
 #>  groups:       Worker (6)
 #> 
 #> Estimate Intercept:
-#>      Variable Mean MAD_SD   5%  50% 95% rhat ess_bulk ess_tail
-#> 1 (Intercept) 59.5      2 56.3 59.5  63 1.02      101      134
+#>      Variable Mean MAD_SD   5%  50%  95% rhat ess_bulk ess_tail
+#> 1 (Intercept) 59.5   1.79 55.8 59.5 62.9 1.01      361      486
 #> 
 #> 
 #> Estimates 'Machine' - marginal means:
 #>    Variable Mean MAD_SD   5%  50%  95% rhat ess_bulk ess_tail
-#> 1 Machine A 52.3   1.88 48.9 52.3 55.5 1.01      127      196
-#> 2 Machine B 60.1   2.89 55.1 60.1 65.3 1.02      101      145
-#> 3 Machine C 66.3   2.00 62.8 66.3 69.8 1.01      156      143
+#> 1 Machine A 52.2   1.84 48.8 52.3 55.5 1.00      415      536
+#> 2 Machine B 60.1   2.71 55.0 60.1 65.0 1.01      363      455
+#> 3 Machine C 66.1   1.78 62.5 66.2 69.5 1.02      307      417
 ```
 
 The key to the output is the `stanova_samples()` function which takes a
@@ -150,14 +154,14 @@ the `return` argument.
 out_array <- stanova_samples(m_machines)
 str(out_array)
 #> List of 2
-#>  $ (Intercept): num [1:250, 1, 1:2] 58.4 58.8 60.4 61.3 59.6 ...
+#>  $ (Intercept): num [1:500, 1, 1:2] 63.5 59.7 58.6 59.1 58.4 ...
 #>   ..- attr(*, "dimnames")=List of 3
-#>   .. ..$ Iteration: chr [1:250] "1" "2" "3" "4" ...
+#>   .. ..$ Iteration: chr [1:500] "1" "2" "3" "4" ...
 #>   .. ..$ Parameter: chr "(Intercept)"
 #>   .. ..$ Chain    : chr [1:2] "chain:1" "chain:2"
-#>  $ Machine    : num [1:250, 1:3, 1:2] -6.25 -6.76 -7.36 -7.27 -7.28 ...
+#>  $ Machine    : num [1:500, 1:3, 1:2] -7.34 -7.39 -6.76 -7.75 -6.66 ...
 #>   ..- attr(*, "dimnames")=List of 3
-#>   .. ..$ Iteration: chr [1:250] "1" "2" "3" "4" ...
+#>   .. ..$ Iteration: chr [1:500] "1" "2" "3" "4" ...
 #>   .. ..$ Parameter: chr [1:3] "Machine A" "Machine B" "Machine C"
 #>   .. ..$ Chain    : chr [1:2] "chain:1" "chain:2"
 #>   ..- attr(*, "estimate")= chr "difference from intercept"
@@ -170,14 +174,14 @@ via the `dimension_chain` argument.
 out_array2 <- stanova_samples(m_machines, dimension_chain = 2)
 str(out_array2)
 #> List of 2
-#>  $ (Intercept): num [1:250, 1:2, 1] 58.4 58.8 60.4 61.3 59.6 ...
+#>  $ (Intercept): num [1:500, 1:2, 1] 63.5 59.7 58.6 59.1 58.4 ...
 #>   ..- attr(*, "dimnames")=List of 3
-#>   .. ..$ Iteration: chr [1:250] "1" "2" "3" "4" ...
+#>   .. ..$ Iteration: chr [1:500] "1" "2" "3" "4" ...
 #>   .. ..$ Chain    : chr [1:2] "chain:1" "chain:2"
 #>   .. ..$ Parameter: chr "(Intercept)"
-#>  $ Machine    : num [1:250, 1:2, 1:3] -6.25 -6.76 -7.36 -7.27 -7.28 ...
+#>  $ Machine    : num [1:500, 1:2, 1:3] -7.34 -7.39 -6.76 -7.75 -6.66 ...
 #>   ..- attr(*, "dimnames")=List of 3
-#>   .. ..$ Iteration: chr [1:250] "1" "2" "3" "4" ...
+#>   .. ..$ Iteration: chr [1:500] "1" "2" "3" "4" ...
 #>   .. ..$ Chain    : chr [1:2] "chain:1" "chain:2"
 #>   .. ..$ Parameter: chr [1:3] "Machine A" "Machine B" "Machine C"
 #>   ..- attr(*, "estimate")= chr "difference from intercept"
@@ -196,5 +200,4 @@ bayesplot::mcmc_trace(out_array2$Machine)
 
 Rouder, J. N., Morey, R. D., Speckman, P. L., & Province, J. M. (2012).
 Default Bayes factors for ANOVA designs. Journal of Mathematical
-Psychology, 56(5), 356â€“374.
-<https://doi.org/10.1016/j.jmp.2012.08.001>
+Psychology, 56(5), 356-374. <https://doi.org/10.1016/j.jmp.2012.08.001>

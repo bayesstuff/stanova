@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 [![Travis build status](https://travis-ci.org/bayesstuff/stanova.svg?branch=master)](https://travis-ci.org/bayesstuff/stanova)
 <!-- badges: end -->
 
-The goal of `stanova` is to provide a more relevant and interpretable `summary` for Bayesian models with categorical covariates and possibly interactions. At the moment, it only provides wrappers for `rstanarm` via functions `stanova_lmer` and `stanova_glmer`.
+The goal of `stanova` is to provide a more relevant and interpretable `summary` for Bayesian models with categorical covariates and possibly interactions. The core function is `stanova()` which requires specifying which `rstanarm` function should be called through argument `model_fun` (e.g., `model_fun = glmer` calls `stan_glmer` and allows fitting Bayesian mixed models).
 
 The issue `stanova` tries to address is that categorical variables with $k$ levels need to be transformed into $k-1$ numerical model coefficients. This poses a problem if a model includes a factor with more than two levels that interacts with another variable. In this case, the most reasonable parameterization of the model is such that the intercept correspond to the (unweighted) grand mean and therefore estimates of the coefficients for the main effects represent average effects (compared to simple effects). In this parameterization, factors with $k$ levels, where $k > 2$ (i.e., more than two levels), cannot be mapped in a 1-to-1 fashion to the $k-1$ coefficients as no such mapping exists. Thus, the estimates of the model coefficients do not represent effects of one factor level, but always pertain to more than one factor level and thus cannot be directly interpreted. In other words, these coefficients should not be looked at. Instead, `stanova` transforms these parameters back such that one gets the information on the factor levels (or combination of factor levels for interactions). The default output shows for each factor level the difference from the intercept which as discussed before corresponds to the (unweighted) grand mean.
 
@@ -41,12 +41,13 @@ The most basic example only uses a single factor with three levels to demonstrat
 library(stanova)
 data("Machines", package = "MEMSS")
 
-m_machines <- stanova_lmer(score ~ Machine + (Machine|Worker),
-                           data=Machines, chains = 2, iter = 500)
-
+m_machines <- stanova(score ~ Machine + (Machine|Worker),
+                      model_fun = "glmer",
+                      data=Machines, chains = 2,
+                      warmup = 250, iter = 750)
 ```
 
-The `summary` method of a `staonva` objects first provides some general information about the fitted model (similar to `rstanarm`). It then provides statistics about the intercept. The next block provides estimates for each factor-level of the `Machine` factor. These estimates represent the difference of the factor level against the intercept. For example, for `Machine A`, the estimate is around `-7` suggesting that the mean of this factor level is 7 points below the intercept (i.e., the grand mean). 
+The `summary` method of a `stanova` objects first provides some general information about the fitted model (similar to `rstanarm`). It then provides statistics about the intercept. The next block provides estimates for each factor-level of the `Machine` factor. These estimates represent the difference of the factor level against the intercept. For example, for `Machine A`, the estimate is around `-7` suggesting that the mean of this factor level is 7 points below the intercept (i.e., the grand mean). 
 
 ```{r}
 summary(m_machines)
@@ -81,5 +82,5 @@ bayesplot::mcmc_trace(out_array2$Machine)
 
 # References
 
-Rouder, J. N., Morey, R. D., Speckman, P. L., & Province, J. M. (2012). Default Bayes factors for ANOVA designs. Journal of Mathematical Psychology, 56(5), 356â€“374. https://doi.org/10.1016/j.jmp.2012.08.001
+Rouder, J. N., Morey, R. D., Speckman, P. L., & Province, J. M. (2012). Default Bayes factors for ANOVA designs. Journal of Mathematical Psychology, 56(5), 356-374. https://doi.org/10.1016/j.jmp.2012.08.001
 
