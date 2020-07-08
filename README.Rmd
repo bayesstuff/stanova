@@ -34,6 +34,14 @@ For the moment, you can only install the development version from [GitHub](https
 # install.packages("devtools")
 devtools::install_github("bayesstuff/stanova")
 ```
+
+**For the moment, `stanova` only works with `emmeans` version `1.4.7` or older.** This can be installed via:
+
+``` r
+devtools::install_version("emmeans", version = "1.4.7", upgrade = "never")
+```
+
+
 ## Example
 
 The most basic example only uses a single factor with three levels to demonstrate the output. 
