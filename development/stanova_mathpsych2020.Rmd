@@ -1,0 +1,242 @@
+---
+title: "`stanova`: User-Friendly Interface and Summaries for Bayesian Statistical Models Estimated with Stan (MathPsych Presentation, 7/2020)"
+author: "Henrik Singmann"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(dpi=200, out.width="70%", fig.asp = 0.618,
+                      fig.width=4, fig.align = "center")
+options(width = 110)
+options(digits = 3)
+options("dplyr.summarise.inform" = FALSE)
+options(pillar.sigfig = 3)
+options(mc.cores = parallel::detectCores()) # fitting uses multicore by default
+```
+
+# Abstract 
+
+Psychological data often consists of multiple orthogonal factors. When analyzing such data with statistical models these factors, like all categorical variables, need to be transformed into numerical covariates using a contrast scheme. To the surprise of many users, the default contrast scheme in the statistical programming language R is such that the intercept is mapped onto the first factor level with the consequence that in models with interactions, coefficients represent simple effects at the first  factor level instead of the usually expected average effects. I will present a software package for R, `stanova` (https://github.com/bayesstuff/stanova), that allows estimating statistical models in a Bayesian framework based on Stan and package `rstanarm` that avoids this problem. It by default uses a factor coding proposed by Rouder et al. (2012, JMP) in which the intercept corresponds to the unweighted grand mean and which allows priors that have the same marginal prior on all factor levels. In addition, `stanova` provides a summary method which reports results for each factor level or design cell – specifically the difference from the intercept – instead of for each model coefficient. This also provides a better user experience than the default output of many statistical packages. The talk will show the implementation of the package in R and its adaptation in JASP, an open source alternative to SPSS.
+
+# `stanova`: Overview
+
+- Most psychological data sets contain multiple, often orthogonal, categorical variables usually called *factors*.
+- When factors are added to a regression-type or ANOVA model, they need to be transformed into numerical variables using a contrast coding scheme.
+
+
+- For factor with $k$ levels, contrast coding schemes create $k-1$ contrast variables. Thus, contrast variables cannot be mapped in 1-to-1 fashion to factor levels.
+  - Modelling software usually returns output on level of contrast variables, which is dififcult to interpret.
+- `stanova` back-transforms contrast variables to factor-levels which allows for easier interpretation. 
+
+
+- Contrast coding schemes for models involving interactions should be orthogonal:
+  - Intercepts corresponds to (unweighted) grand mean (i.e., mean of all design cells)
+  - Default `R` contrasts, `contr.tratment` are not orthogonal!
+- For Bayesian models, contrasts should be orthonormal (Rouder et al., 2012): Ensures that marginal priors is the same on all factor-levels (and not only the same on all ) 
+- `stanova` per-default uses orthonormal priors proposed by Rouder et al. (2012).
+
+
+## Installation
+
+For the moment, you can only install the development version from [GitHub](https://github.com/bayesstuff/stanova) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("bayesstuff/stanova")
+```
+
+**For the moment, `stanova` only works with `emmeans` version `1.4.7` or older.** This can be installed via:
+
+``` r
+devtools::install_version("emmeans", version = "1.4.7", upgrade = "never")
+```
+
+All other packages needed here are available from `CRAN`.
+
+# Setup
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
+library("rstanarm")
+library("stanova")
+library("tidyverse")
+theme_set(theme_bw(base_size = 15) + 
+            theme(legend.position="bottom", 
+                  panel.grid.major.x = element_blank()))
+```
+
+
+# Example Data
+
+
+
+```{r}
+data("fhch2010", package = "afex") ## requires that package afex is installed
+
+fhch <- fhch2010 %>%
+  as_tibble() %>% 
+  filter(correct) %>% 
+  filter(task == "lexdec") %>% 
+  droplevels
+
+```
+
+```{r}
+length(unique(fhch$id))
+```
+
+
+```{r}
+means <- fhch %>% 
+  group_by(stimulus, length, id) %>% 
+  summarise(rt = mean(rt)) %>% 
+  group_by(stimulus, length) %>% 
+  summarise(mean_rt = mean(rt), 
+            se = sd(rt)/sqrt(n()))
+
+means %>% 
+  select(-se) %>% 
+  pivot_wider(id_cols = stimulus, 
+              names_from = length, values_from = mean_rt)
+
+## row means
+means %>% 
+  select(-se) %>% 
+  pivot_wider(id_cols = stimulus, 
+              names_from = length, values_from = mean_rt) %>% 
+  ungroup %>% 
+  select(-stimulus) %>% 
+  rowMeans() %>% 
+  round(2)
+
+## column means
+means %>% 
+  select(-se) %>% 
+  pivot_wider(id_cols = stimulus, 
+              names_from = length, values_from = mean_rt) %>% 
+  ungroup %>% 
+  select(-stimulus) %>% 
+  colMeans() %>% 
+  round(2)
+
+## mean of cell means
+mean(means$mean_rt) %>% 
+  round(2)
+```
+
+```{r, fig.asp = 1, out.width="90%", message=FALSE}
+a1 <- afex::aov_ez("id", "rt", fhch, within = c("length", "stimulus"))
+p1 <- afex::afex_plot(a1, "length", "stimulus", error = "within", 
+                data_geom = ggbeeswarm::geom_beeswarm, 
+                data_arg = list(
+                  dodge.width = 0.5,  ## needs to be same as dodge
+                  cex = 0.8,
+                  color = "darkgrey"), 
+                factor_levels = list(
+                  length = c(4, 5, 6)
+                )) +
+  labs(x = "length (number of characters)", y = "RT (in seconds)")
+p1 
+p2 <- afex::afex_plot(a1, "length", "stimulus", error = "within", 
+                data_geom = ggbeeswarm::geom_beeswarm, 
+                data_arg = list(
+                  dodge.width = 0.5,  ## needs to be same as dodge
+                  cex = 0.8,
+                  color = "darkgrey"), 
+                factor_levels = list(
+                  length = c(4, 5, 6)
+                ), point_arg = list(size = 3.5), line_arg = list(size = 1.2), 
+                error_arg = list(size = 1.2, width = 0)) + 
+  labs(x = "length (number of characters)", y = "RT (in seconds)") +
+  theme_bw(base_size = 20) + 
+            theme(legend.position="bottom", 
+                  panel.grid.major.x = element_blank())
+ggsave(filename = "example_data.png", plot = p2, 
+       width = 12, height = 17, units = "cm", dpi = 200)
+```
+
+# Using `rstanarm`
+
+## Default (Treatment) Contrasts
+
+```{r treatment-model, cache=TRUE}
+m_def <- stan_lmer(rt ~ length*stimulus + (length*stimulus|id), fhch)
+```
+
+```{r}
+summary(m_def, pars = "(Intercept)", regex_pars = c("^length", "^stimulus"), 
+        digits = 2)
+```
+
+
+## Sum-To-Zero Contrasts (ANOVA Appropriate)
+
+```{r sum-to-zero-model, cache=TRUE}
+afex::set_sum_contrasts()
+m_sum <- stan_lmer(rt ~ length*stimulus + (length*stimulus|id), fhch)
+```
+
+```{r}
+summary(m_sum, pars = "(Intercept)", regex_pars = c("^length", "^stimulus"), 
+        digits = 2)
+```
+
+# Model Matrices
+
+```{r}
+df_both <- expand_grid(
+  stimulus = sort(unique(fhch$stimulus)),
+  length = sort(unique(fhch$length))
+)
+df_stim <- expand_grid(
+  stimulus = sort(unique(fhch$stimulus))
+)
+df_length <- expand_grid(
+  length = sort(unique(fhch$length))
+)
+```
+
+```{r}
+
+
+knitr::kable(cbind(
+  df_length, 
+  model.matrix(~ length, df_length, contrasts.arg = list(length = "contr.treatment"))
+))
+knitr::kable(cbind(
+  df_length, 
+  model.matrix(~ length, df_length, contrasts.arg = list(length = "contr.sum"))
+))
+knitr::kable(cbind(
+  df_length, 
+  model.matrix(~ length, df_length, contrasts.arg = list(length = "contr.bayes"))
+))
+```
+
+
+# Using `stanova`
+
+```{r stanova-model, cache=TRUE}
+m_stanova <- stanova_lmer(rt ~ length*stimulus + (length*stimulus|id), fhch)
+```
+
+```{r}
+summary(m_stanova, digits = 2)
+```
+
+```{r}
+summary(m_stanova, diff_intercept = FALSE, digits = 2)
+```
+
+
+
+```{r, include=FALSE, eval=FALSE}
+save(m_def, m_stanova, m_sum, 
+     file = "models_talk.rda", compress = "xz")
+load("models_talk.rda")
+```
+
