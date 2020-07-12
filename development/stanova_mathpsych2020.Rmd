@@ -236,7 +236,7 @@ summary(m_stanova, diff_intercept = FALSE, digits = 2)
 
 ```{r, include=FALSE, eval=FALSE}
 save(m_def, m_stanova, m_sum, 
-     file = "models_talk.rda", compress = "xz")
-load("models_talk.rda")
+     file = "development/models_talk.rda", compress = "xz")
+load("development/models_talk.rda")
 ```
 

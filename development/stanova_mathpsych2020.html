@@ -1852,10 +1852,6 @@ df_length &lt;- expand_grid(
 ## Running the chains for more iterations may help. See
 ## http://mc-stan.org/misc/warnings.html#bulk-ess</code></pre>
 <pre class="r"><code>summary(m_stanova, digits = 2)</code></pre>
-<pre><code>## NOTE: Results may be misleading due to involvement in interactions
-## NOTE: Results may be misleading due to involvement in interactions
-## NOTE: Results may be misleading due to involvement in interactions
-## NOTE: Results may be misleading due to involvement in interactions</code></pre>
 <pre><code>## 
 ## Model Info:
 ##  function:     stanova_glmer
@@ -1870,33 +1866,29 @@ df_length &lt;- expand_grid(
 ## 
 ## Estimate Intercept:
 ##      Variable Mean MAD_SD   5%  50%  95% rhat ess_bulk ess_tail
-## 1 (Intercept) 1.13 0.0507 1.04 1.12 1.21 1.01      373      728
+## 1 (Intercept) 1.13   0.05 1.04 1.12 1.21 1.01   372.52   727.74
 ## 
 ## 
 ## Estimates &#39;length&#39; - difference from intercept:
-##   Variable     Mean  MAD_SD      5%      50%     95% rhat ess_bulk ess_tail
-## 1 length 4 -0.03053 0.01023 -0.0470 -0.03054 -0.0137    1     4780     3398
-## 2 length 5  0.00212 0.00967 -0.0148  0.00225  0.0179    1     4595     3110
-## 3 length 6  0.02841 0.01031  0.0111  0.02848  0.0458    1     4277     3517
+##   Variable  Mean MAD_SD    5%   50%   95% rhat ess_bulk ess_tail
+## 1 length 4 -0.03   0.01 -0.05 -0.03 -0.01 1.00  4779.76  3398.18
+## 2 length 5  0.00   0.01 -0.01  0.00  0.02 1.00  4595.41  3110.39
+## 3 length 6  0.03   0.01  0.01  0.03  0.05 1.00  4277.31  3517.13
 ## 
 ## Estimates &#39;stimulus&#39; - difference from intercept:
-##           Variable    Mean MAD_SD       5%     50%      95% rhat ess_bulk ess_tail
-## 1    stimulus word -0.0307  0.014 -0.05345 -0.0307 -0.00738    1     1463     1880
-## 2 stimulus nonword  0.0307  0.014  0.00738  0.0307  0.05345    1     1463     1880
+##           Variable  Mean MAD_SD    5%   50%   95% rhat ess_bulk ess_tail
+## 1    stimulus word -0.03   0.01 -0.05 -0.03 -0.01 1.00  1463.09  1880.41
+## 2 stimulus nonword  0.03   0.01  0.01  0.03  0.05 1.00  1463.09  1880.41
 ## 
 ## Estimates &#39;length:stimulus&#39; - difference from intercept:
-##                     Variable    Mean MAD_SD       5%     50%      95% rhat ess_bulk ess_tail
-## 1    length 4, stimulus word -0.0454 0.0183 -0.07617 -0.0459 -0.01515    1     2992     3034
-## 2    length 5, stimulus word -0.0322 0.0197 -0.06507 -0.0321  0.00041    1     2125     2593
-## 3    length 6, stimulus word -0.0146 0.0225 -0.05111 -0.0150  0.02253    1     2042     2623
-## 4 length 4, stimulus nonword -0.0157 0.0191 -0.04655 -0.0156  0.01549    1     2435     3111
-## 5 length 5, stimulus nonword  0.0364 0.0192  0.00318  0.0371  0.06897    1     2038     2718
-## 6 length 6, stimulus nonword  0.0714 0.0235  0.03273  0.0715  0.10841    1     2121     2451</code></pre>
+##                     Variable  Mean MAD_SD    5%   50%   95% rhat ess_bulk ess_tail
+## 1    length 4, stimulus word -0.05   0.02 -0.08 -0.05 -0.02 1.00  2992.05  3034.03
+## 2    length 5, stimulus word -0.03   0.02 -0.07 -0.03  0.00 1.00  2124.72  2592.65
+## 3    length 6, stimulus word -0.01   0.02 -0.05 -0.01  0.02 1.00  2041.90  2622.75
+## 4 length 4, stimulus nonword -0.02   0.02 -0.05 -0.02  0.02 1.00  2435.06  3110.78
+## 5 length 5, stimulus nonword  0.04   0.02  0.00  0.04  0.07 1.00  2038.29  2718.39
+## 6 length 6, stimulus nonword  0.07   0.02  0.03  0.07  0.11 1.00  2120.55  2451.08</code></pre>
 <pre class="r"><code>summary(m_stanova, diff_intercept = FALSE, digits = 2)</code></pre>
-<pre><code>## NOTE: Results may be misleading due to involvement in interactions
-## NOTE: Results may be misleading due to involvement in interactions
-## NOTE: Results may be misleading due to involvement in interactions
-## NOTE: Results may be misleading due to involvement in interactions</code></pre>
 <pre><code>## 
 ## Model Info:
 ##  function:     stanova_glmer
@@ -1911,28 +1903,28 @@ df_length &lt;- expand_grid(
 ## 
 ## Estimate Intercept:
 ##      Variable Mean MAD_SD   5%  50%  95% rhat ess_bulk ess_tail
-## 1 (Intercept) 1.13 0.0507 1.04 1.12 1.21 1.01      373      728
+## 1 (Intercept) 1.13   0.05 1.04 1.12 1.21 1.01   372.52   727.74
 ## 
 ## 
 ## Estimates &#39;length&#39; - marginal means:
 ##   Variable Mean MAD_SD   5%  50%  95% rhat ess_bulk ess_tail
-## 1 length 4 1.10 0.0522 1.01 1.09 1.18 1.01      384      788
-## 2 length 5 1.13 0.0529 1.04 1.13 1.22 1.01      378      679
-## 3 length 6 1.15 0.0517 1.07 1.15 1.24 1.01      392      860
+## 1 length 4 1.10   0.05 1.01 1.09 1.18 1.01   384.23   788.14
+## 2 length 5 1.13   0.05 1.04 1.13 1.22 1.01   378.24   679.26
+## 3 length 6 1.15   0.05 1.07 1.15 1.24 1.01   392.20   860.49
 ## 
 ## Estimates &#39;stimulus&#39; - marginal means:
 ##           Variable Mean MAD_SD   5%  50%  95% rhat ess_bulk ess_tail
-## 1    stimulus word 1.10 0.0521 1.01 1.09 1.18 1.01      445      704
-## 2 stimulus nonword 1.16 0.0531 1.07 1.16 1.25 1.01      371      916
+## 1    stimulus word 1.10   0.05 1.01 1.09 1.18 1.01   444.83   704.04
+## 2 stimulus nonword 1.16   0.05 1.07 1.16 1.25 1.01   371.01   915.66
 ## 
 ## Estimates &#39;length:stimulus&#39; - marginal means:
-##                     Variable Mean MAD_SD    5%  50%  95% rhat ess_bulk ess_tail
-## 1    length 4, stimulus word 1.08 0.0524 0.994 1.08 1.17 1.01      445      747
-## 2    length 5, stimulus word 1.09 0.0540 1.002 1.09 1.19 1.01      460      809
-## 3    length 6, stimulus word 1.11 0.0552 1.018 1.11 1.21 1.01      514      862
-## 4 length 4, stimulus nonword 1.11 0.0567 1.017 1.11 1.21 1.01      395      886
-## 5 length 5, stimulus nonword 1.16 0.0551 1.072 1.16 1.26 1.01      390      999
-## 6 length 6, stimulus nonword 1.20 0.0558 1.108 1.20 1.29 1.01      416      912</code></pre>
+##                     Variable Mean MAD_SD   5%  50%  95% rhat ess_bulk ess_tail
+## 1    length 4, stimulus word 1.08   0.05 0.99 1.08 1.17 1.01   445.06   747.11
+## 2    length 5, stimulus word 1.09   0.05 1.00 1.09 1.19 1.01   459.50   809.07
+## 3    length 6, stimulus word 1.11   0.06 1.02 1.11 1.21 1.01   513.59   861.57
+## 4 length 4, stimulus nonword 1.11   0.06 1.02 1.11 1.21 1.01   394.53   885.80
+## 5 length 5, stimulus nonword 1.16   0.06 1.07 1.16 1.26 1.01   389.97   999.04
+## 6 length 6, stimulus nonword 1.20   0.06 1.11 1.20 1.29 1.01   415.84   912.29</code></pre>
 </div>
 
 
