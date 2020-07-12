@@ -141,7 +141,7 @@ get_stanova_samples <- function(term, object, diff_intercept,
     }
   } else {
       ## extract samples per factor-level or design cell and concatenate chains
-      tmp <- coda::as.mcmc(emmeans::emmeans(object, term))
+      tmp <- suppressMessages(coda::as.mcmc(emmeans::emmeans(object, term)))
       ## in case we only have one chain, we need to transform to mcmc.list first
       ## before transforming into array
       if (!coda::is.mcmc.list(tmp)) {
