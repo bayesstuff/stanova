@@ -117,14 +117,25 @@ print.summary.stanova <-
     }
 
     cat("\n\nEstimate Intercept:\n")
-    print(x$`(Intercept)`, digits = digits)
+    print_round(x$`(Intercept)`, digits = digits)
     cat("\n")
 
     for (i in seq_len(length(x)-1)) {
       cat("\nEstimates '", names(x)[i+1] ,"' - ",
           atts$estimate[i],
           ":\n", sep = "")
-      print(x[[i+1]], digits = digits)
+      print_round(x[[i+1]], digits = digits)
     }
     invisible(x)
   }
+
+print_round <- function(x, digits, ...) {
+  if (is.list(x)) {
+    for (i in seq_along(x)) {
+      if (is.numeric(x[[i]])) {
+        x[[i]] <- round(x[[i]], digits = digits)
+      }
+    }
+  }
+  print(format(x, nsmall = digits), quote = FALSE, ...)
+}
