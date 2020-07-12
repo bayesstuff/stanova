@@ -91,7 +91,7 @@ formula_string <- function (formula, break_and_indent = TRUE)
 
 #' @export
 print.summary.stanova <-
-  function(x, digits = max(3L, attr(x, "print.digits")),
+  function(x, digits = max(1L, attr(x, "print.digits")),
            ...) {
     atts <- attributes(x)
     cat("\nModel Info:")
