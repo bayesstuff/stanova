@@ -235,6 +235,7 @@ summary(m_stanova, diff_intercept = FALSE, digits = 2)
 
 
 ```{r, include=FALSE, eval=FALSE}
+write.csv(fhch, file = "development/fhch.csv")
 save(m_def, m_stanova, m_sum, 
      file = "development/models_talk.rda", compress = "xz")
 load("development/models_talk.rda")
