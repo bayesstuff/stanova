@@ -65,11 +65,19 @@ For the moment, you can only install the development version from
 devtools::install_github("bayesstuff/stanova")
 ```
 
-**For the moment, `stanova` only works with `emmeans` version `1.4.7` or
-older.** This can be installed via:
+**`stanova` requires `rstanarm` version `2.21.2` which is not yet on
+CRAN, but must be installed from source**:
 
 ``` r
-devtools::install_version("emmeans", version = "1.4.7", upgrade = "never")
+Sys.setenv("MAKEFLAGS" = "-j4")  ## uses 4 cores during installation
+devtools::install_github("stan-dev/rstanarm", build_vignettes = FALSE)
+```
+
+Also, at least version `1.4.7` of `emmeans` is needed which can be
+installed from CRAN:
+
+``` r
+install.packages("emmeans")
 ```
 
 ## Example
@@ -111,15 +119,15 @@ summary(m_machines)
 #>  groups:       Worker (6)
 #> 
 #> Estimate Intercept:
-#>      Variable Mean MAD_SD   5%  50% 95% rhat ess_bulk ess_tail
-#> 1 (Intercept) 59.7   1.76 56.8 59.6  63 1.01      401      496
+#>      Variable   Mean MAD_SD     5%    50%    95%  rhat ess_bulk ess_tail
+#> 1 (Intercept) 59.459  1.848 56.052 59.472 62.716 1.001  336.289  417.863
 #> 
 #> 
 #> Estimates 'Machine' - difference from intercept:
-#>    Variable  Mean MAD_SD    5%   50%   95% rhat ess_bulk ess_tail
-#> 1 Machine A -7.22   1.16 -9.28 -7.24 -5.02 1.01      468      532
-#> 2 Machine B  0.71   1.26 -1.59  0.75  2.97 1.01      484      583
-#> 3 Machine C  6.51   1.09  4.54  6.55  8.61 1.00      445      412
+#>    Variable   Mean MAD_SD     5%    50%    95%  rhat ess_bulk ess_tail
+#> 1 Machine A -7.214  0.871 -8.840 -7.218 -5.596 1.004  365.941  377.609
+#> 2 Machine B  0.567  1.331 -1.744  0.521  2.861 1.003  405.820  502.891
+#> 3 Machine C  6.647  1.121  4.551  6.650  8.756 1.001  428.091  467.198
 ```
 
 If one is not interested in the differences from the factor levels, it
@@ -141,15 +149,15 @@ summary(m_machines, diff_intercept = FALSE)
 #>  groups:       Worker (6)
 #> 
 #> Estimate Intercept:
-#>      Variable Mean MAD_SD   5%  50% 95% rhat ess_bulk ess_tail
-#> 1 (Intercept) 59.7   1.76 56.8 59.6  63 1.01      401      496
+#>      Variable   Mean MAD_SD     5%    50%    95%  rhat ess_bulk ess_tail
+#> 1 (Intercept) 59.459  1.848 56.052 59.472 62.716 1.001  336.289  417.863
 #> 
 #> 
 #> Estimates 'Machine' - marginal means:
-#>    Variable Mean MAD_SD   5%  50%  95% rhat ess_bulk ess_tail
-#> 1 Machine A 52.5   1.66 49.5 52.4 55.8 1.00      484      443
-#> 2 Machine B 60.5   2.85 56.1 60.4 65.1 1.01      418      515
-#> 3 Machine C 66.3   1.77 62.9 66.2 69.6 1.00      344      499
+#>    Variable   Mean MAD_SD     5%    50%    95%  rhat ess_bulk ess_tail
+#> 1 Machine A 52.245  1.609 49.331 52.214 55.116 1.003  334.418  541.982
+#> 2 Machine B 60.026  2.926 55.259 59.966 64.771 1.000  337.456  336.202
+#> 3 Machine C 66.106  1.902 62.687 66.122 69.565 1.005  396.441  540.749
 ```
 
 The key to the output is the `stanova_samples()` function which takes a
@@ -163,12 +171,12 @@ the `return` argument.
 out_array <- stanova_samples(m_machines)
 str(out_array)
 #> List of 2
-#>  $ (Intercept): num [1:500, 1, 1:2] 59.3 57.6 58.2 58.6 57.7 ...
+#>  $ (Intercept): num [1:500, 1, 1:2] 59.3 60.5 62.2 61 58.7 ...
 #>   ..- attr(*, "dimnames")=List of 3
 #>   .. ..$ Iteration: chr [1:500] "1" "2" "3" "4" ...
 #>   .. ..$ Parameter: chr "(Intercept)"
 #>   .. ..$ Chain    : chr [1:2] "chain:1" "chain:2"
-#>  $ Machine    : num [1:500, 1:3, 1:2] -9.11 -7.37 -6.07 -6.81 -7.94 ...
+#>  $ Machine    : num [1:500, 1:3, 1:2] -7.22 -7.76 -8.57 -8.02 -8.25 ...
 #>   ..- attr(*, "dimnames")=List of 3
 #>   .. ..$ Iteration: chr [1:500] "1" "2" "3" "4" ...
 #>   .. ..$ Parameter: chr [1:3] "Machine A" "Machine B" "Machine C"
@@ -183,12 +191,12 @@ via the `dimension_chain` argument.
 out_array2 <- stanova_samples(m_machines, dimension_chain = 2)
 str(out_array2)
 #> List of 2
-#>  $ (Intercept): num [1:500, 1:2, 1] 59.3 57.6 58.2 58.6 57.7 ...
+#>  $ (Intercept): num [1:500, 1:2, 1] 59.3 60.5 62.2 61 58.7 ...
 #>   ..- attr(*, "dimnames")=List of 3
 #>   .. ..$ Iteration: chr [1:500] "1" "2" "3" "4" ...
 #>   .. ..$ Chain    : chr [1:2] "chain:1" "chain:2"
 #>   .. ..$ Parameter: chr "(Intercept)"
-#>  $ Machine    : num [1:500, 1:2, 1:3] -9.11 -7.37 -6.07 -6.81 -7.94 ...
+#>  $ Machine    : num [1:500, 1:2, 1:3] -7.22 -7.76 -8.57 -8.02 -8.25 ...
 #>   ..- attr(*, "dimnames")=List of 3
 #>   .. ..$ Iteration: chr [1:500] "1" "2" "3" "4" ...
 #>   .. ..$ Chain    : chr [1:2] "chain:1" "chain:2"

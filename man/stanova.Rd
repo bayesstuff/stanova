@@ -4,7 +4,14 @@
 \alias{stanova}
 \title{Estimate ANOVA-type models with rstanarm}
 \usage{
-stanova(formula, data, model_fun, ..., check_contrasts = "contr.bayes")
+stanova(
+  formula,
+  data,
+  model_fun,
+  ...,
+  check_contrasts = "contr.bayes",
+  pass_contrasts = TRUE
+)
 }
 \arguments{
 \item{formula}{a formula describing the statistical model to be estimated.
@@ -24,6 +31,12 @@ or \code{core}.}
 function which should be assigned to all \code{character} and \code{factor} variables
 in the model (as long as the specified contrast is not the global default).
 Default is \link{contr.bayes}. Set to \code{NULL} to disable the check.}
+
+\item{pass_contrasts}{If \code{TRUE}, assigned (or checked) contrasts are passed
+to the modelling function as a \code{list}. If \code{FALSE}, assigned contrasts are
+added to the passed \code{data} object and this object is passed to the
+modelling function (i.e., \code{FALSE} changes the original data and \code{TRUE} does
+not).}
 }
 \description{
 Estimate ANOVA-type models with rstanarm

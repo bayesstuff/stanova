@@ -35,10 +35,16 @@ For the moment, you can only install the development version from [GitHub](https
 devtools::install_github("bayesstuff/stanova")
 ```
 
-**For the moment, `stanova` only works with `emmeans` version `1.4.7` or older.** This can be installed via:
+**`stanova` requires `rstanarm` version `2.21.2` which is not yet on CRAN, but must be installed from source**:
 
 ``` r
-devtools::install_version("emmeans", version = "1.4.7", upgrade = "never")
+Sys.setenv("MAKEFLAGS" = "-j4")  ## uses 4 cores during installation
+devtools::install_github("stan-dev/rstanarm", build_vignettes = FALSE)
+```
+
+Also, at least version `1.4.7` of `emmeans` is needed which can be installed from CRAN:
+``` r
+install.packages("emmeans")
 ```
 
 

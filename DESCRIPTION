@@ -22,8 +22,8 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Imports: 
-    rstanarm,
-    emmeans,
+    rstanarm (>= 2.21.2),
+    emmeans (>= 1.4.8),
     lme4,
     coda,
     rstan,

@@ -3,16 +3,21 @@
 #' @param formula a formula describing the statistical model to be estimated.
 #'   Passed to the `rstanarm::stan_` function specified in `model_fun`.
 #' @param data `data.frame` containing the data.
+#' @param model_fun character string identifying the `rstanarm` function that
+#'   should be used for fitting (omitting the `stan_` prefix) such as `"glm"` or
+#'   `"glmer"`.
 #' @param check_contrasts `character` string (of length 1) denoting a contrast
 #'   function which should be assigned to all `character` and `factor` variables
 #'   in the model (as long as the specified contrast is not the global default).
 #'   Default is [contr.bayes]. Set to `NULL` to disable the check.
+#' @param pass_contrasts If `TRUE`, assigned (or checked) contrasts are passed
+#'   to the modelling function as a `list`. If `FALSE`, assigned contrasts are
+#'   added to the passed `data` object and this object is passed to the
+#'   modelling function (i.e., `FALSE` changes the original data and `TRUE` does
+#'   not).
 #' @param ... further arguments passed to the `rstanarm` function used for
 #'   fitting. Typical arguments are `prior`, `prior_intercept`, `chain`, `iter`,
 #'   or `core`.
-#' @param model_fun character string identifying the `rstanarm` function that
-#'   should be used for fitting (omitting the `stan_` prefix) such as `"glm"` or
-#'   `"glmer"`.
 #'
 #' @example examples/examples.stanova.R
 #'
@@ -22,7 +27,8 @@ stanova <- function(
   data,
   model_fun,
   ...,
-  check_contrasts = "contr.bayes") {
+  check_contrasts = "contr.bayes",
+  pass_contrasts = TRUE) {
   call <- match.call()
   orig_call <- call
 
@@ -33,10 +39,13 @@ stanova <- function(
   # }
 
   if (!is.null(check_contrasts)) {
-    # contrasts_list <- create_contrasts_list(formula = formula, data = data,
-    #                         new_contrast = check_contrasts)
-    data <- check_contrasts(formula = formula, data = data,
+    if (pass_contrasts) {
+      contrasts_list <- create_contrasts_list(formula = formula, data = data,
                             new_contrast = check_contrasts)
+    } else {
+      data <- check_contrasts(formula = formula, data = data,
+                              new_contrast = check_contrasts)
+    }
   }
 
 
@@ -46,10 +55,14 @@ stanova <- function(
   if ("check_contrasts" %in% names(call)) {
     call[["check_contrasts"]] <- NULL
   }
-  # if (!is.null(contrasts_list)) {
-  #   call[["contrasts"]] <- contrasts_list
-  # }
-  call[["data"]] <- data
+    if ("pass_contrasts" %in% names(call)) {
+    call[["pass_contrasts"]] <- NULL
+  }
+  if (pass_contrasts && !is.null(contrasts_list)) {
+    call[["contrasts"]] <- contrasts_list
+  } else {
+    call[["data"]] <- data
+  }
   mout <- eval.parent(call)
 
   ## prepare output object
