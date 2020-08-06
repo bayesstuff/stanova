@@ -120,17 +120,34 @@ get_stanova_samples <- function(term, object, diff_intercept,
                                 intercept_array,
                                 dimension_chain) {
   num_vars <- vapply(object[["data"]][,term,drop = FALSE], is.numeric, TRUE)
+  names_num_vars <- names(num_vars)[num_vars]
   if (any(num_vars)) {
+    sd_num <- apply(object[["data"]][,names_num_vars,drop = FALSE], 2, sd)
+    mean_num <- apply(object[["data"]][,names_num_vars,drop = FALSE], 2, mean)
     if (length(term) == 1) {
       tmp <- extract_array_rstanarm(object, pars = term)
       attr(tmp, "estimate") <- paste0("trend ('", term, "')")
     } else {
       i <- 1 ## which numerical variable is chosen, default is 1
-      tmp <- coda::as.mcmc(emmeans::emtrends(
+      spec_vars <- term[-which(num_vars)[i]]
+      ## calculate 'at' values in case there are additional numerical variables
+      addl_num <- spec_vars[spec_vars %in% names_num_vars]
+      if (length(addl_num) > 0) {
+        atlist <- lapply(addl_num, function(x) {c(
+          m1 = mean_num[x] - 1*sd_num[x],
+          mean_num[x],
+          mean_num[x] + 1*sd_num[x])})
+        names(atlist) <- addl_num
+      } else {
+        atlist <- list()
+      }
+      emms <- suppressMessages(emmeans::emtrends(
         object = object,
-        specs = term[-which(num_vars)[i]],
-        var = term[which(num_vars)[i]]
+        specs = spec_vars,
+        var = term[which(num_vars)[i]],
+        at = atlist
       ))
+      tmp <- coda::as.mcmc(emms)
       if (!coda::is.mcmc.list(tmp)) {
         tmp <- coda::as.mcmc.list(tmp)
       }
@@ -138,6 +155,21 @@ get_stanova_samples <- function(term, object, diff_intercept,
       dimnames(tmp)[[3]] <- dimnames(intercept_array)[[3]]
       names(dimnames(tmp)) <- names(dimnames(intercept_array))
       attr(tmp, "estimate") <- paste0("trend ('", term[which(num_vars)[i]], "')")
+
+      ## in case there are numerical variables to condition on, rename
+      if (length(addl_num) > 0) {
+        df_for_names <- as.data.frame(summary(emms))
+        for (j in seq_along(addl_num)) {
+          df_for_names[,addl_num[j]] <- c("M-SD", "M   ", "M+SD")
+        }
+        namelist <- lapply(spec_vars, function(x) paste(x, df_for_names[, x]))
+        if (length(namelist) > 1) {
+          namelist <- apply(as.data.frame(namelist), 1, paste, collapse = ", ")
+        } else {
+          namelist <- namelist[[1]]
+        }
+        dimnames(tmp)[["Parameter"]] <- namelist
+      }
     }
   } else {
       ## extract samples per factor-level or design cell and concatenate chains
