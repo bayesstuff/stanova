@@ -160,7 +160,9 @@ get_stanova_samples <- function(term, object, diff_intercept,
       if (length(addl_num) > 0) {
         df_for_names <- as.data.frame(summary(emms))
         for (j in seq_along(addl_num)) {
-          df_for_names[,addl_num[j]] <- c("M-SD", "M   ", "M+SD")
+          tmp_vals <- factor(df_for_names[,addl_num[j]])
+          levels(tmp_vals) <- c("M-SD", "M   ", "M+SD")
+          df_for_names[,addl_num[j]] <- as.character(tmp_vals)
         }
         namelist <- lapply(spec_vars, function(x) paste(x, df_for_names[, x]))
         if (length(namelist) > 1) {
