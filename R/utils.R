@@ -51,3 +51,4 @@ create_contrasts_list <- function(formula, data, new_contrast) {
   return(outlist)
 }
 
+
