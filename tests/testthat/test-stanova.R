@@ -54,7 +54,7 @@ test_that("Binomial GLM works", {
   modglm <- glm(cbind(numdead, numalive = 20-numdead) ~ sex*ldose,
                 data = dfbin, family = binomial,
                 contrasts = list(sex = "contr.sum"))
-  summary(modglm)
+  #summary(modglm)
 
   expect_equivalent(sum1$`(Intercept)`$Mean,
                     coef(modglm)[1],
