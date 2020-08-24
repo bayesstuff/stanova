@@ -23,7 +23,6 @@
 #' @export
 stanova_samples <- function(object, ...) UseMethod("stanova_samples", object)
 
-
 #' @rdname stanova_samples
 #' @export
 stanova_samples.stanova <- function(
@@ -35,7 +34,14 @@ stanova_samples.stanova <- function(
   ...
 ) {
   return <- match.arg(return)
-  all_terms <- stats::terms(lme4::nobars(object$formula))
+  #browser()
+  if (inherits(object, "brmsfit")) {
+    all_terms <- stats::terms(lme4::nobars(object$formula$formula))
+  } else if (inherits(object, "stanreg")) {
+    all_terms <- stats::terms(lme4::nobars(object$formula))
+  } else {
+    stop("not supported model.", call. = FALSE)
+  }
   terms_chr <- attr(all_terms, "term.labels")
   if (!missing(terms)) {
     # if (length(terms[ !(terms %in% terms2)]) > 0)
@@ -46,7 +52,14 @@ stanova_samples.stanova <- function(
   names(term2) <- terms_chr
 
   ### extract samples as arrays
-  post_intercept <- extract_array_rstanarm(object, pars = "(Intercept)")
+  post_intercept <- safe_get_stanova_samples(
+    term = "1",
+    object = object,
+    diff_intercept = FALSE,
+    intercept_array = NULL,
+    dimension_chain = dimension_chain
+  )
+  #extract_array_rstanarm(object, pars = "(Intercept)")
 
   post_diff <- lapply(term2, safe_get_stanova_samples,
                       object = object,
@@ -76,7 +89,7 @@ stanova_samples.stanova <- function(
         dim(out[[i]])[dims["iter"]] * dim(out[[i]])[dims["chain"]],
         dim(out[[i]])[dims["par"]]
       )
-      colnames(tmp_arr) <- dimnames(out[[i]])[["Parameter"]]
+      colnames(tmp_arr) <- dimnames(out[[i]])[[2]]
       out[[i]] <- tmp_arr
       attr(out[[i]], "estimate") <- type_est
     }
@@ -119,8 +132,12 @@ stanova_samples.stanova <- function(
 get_stanova_samples <- function(term, object, diff_intercept,
                                 intercept_array,
                                 dimension_chain) {
-  num_vars <- vapply(object[["data"]][,term,drop = FALSE], is.numeric, TRUE)
-  names_num_vars <- names(num_vars)[num_vars]
+  if (term[1] == "1") {
+    num_vars <- FALSE
+  } else {
+    num_vars <- vapply(object[["data"]][,term,drop = FALSE], is.numeric, TRUE)
+    names_num_vars <- names(num_vars)[num_vars]
+  }
   if (any(num_vars)) {
     sd_num <- apply(object[["data"]][,names_num_vars,drop = FALSE], 2, sd)
     mean_num <- apply(object[["data"]][,names_num_vars,drop = FALSE], 2, mean)

@@ -5,7 +5,7 @@ summary.stanova <- function(object,
                             probs = c(0.05, 0.5, 0.95),
                             ...,
                             digits = 3L) {
-
+  #browser()
   ## get summaries:
   matrix_diff <- stanova_samples(object,
                                  diff_intercept = diff_intercept,
