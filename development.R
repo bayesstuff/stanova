@@ -11,7 +11,7 @@ devtools::check()
 usethis::use_build_ignore("development.R")
 usethis::use_build_ignore("examples/")
 
-use_package("rstanarm")
+use_package("rstanarm", type = "Suggests")
 use_package("lme4")
 use_package("emmeans", type = "Depends")
 use_package("rstan")

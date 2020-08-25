@@ -13,7 +13,7 @@ stanova_brm <- function(
   check_contrasts = "contr.bayes"
 ) {
   if (!requireNamespace("brms")) {
-    stop("package brms is required.", call. = FALSE)
+    stop("Package brms is required.", call. = FALSE)
   }
   call <- match.call()
   orig_call <- call
