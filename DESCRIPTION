@@ -23,7 +23,6 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Imports: 
     rstanarm,
-    emmeans (>= 1.5.0),
     lme4,
     coda,
     rstan,
@@ -39,3 +38,5 @@ Suggests:
     tibble,
     tidybayes,
     tidyverse
+Depends: 
+    emmeans

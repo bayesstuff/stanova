@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 [![R build status](https://github.com/bayesstuff/stanova/workflows/R-CMD-check/badge.svg)](https://github.com/bayesstuff/stanova/actions)
 <!-- badges: end -->
 
-The goal of `stanova` is to provide a more relevant and interpretable `summary` for Bayesian models with categorical covariates and possibly interactions. The core function is `stanova()` which requires specifying which `rstanarm` function should be called through argument `model_fun` (e.g., `model_fun = glmer` calls `stan_glmer` and allows fitting Bayesian mixed models).
+The goal of `stanova` is to provide a more relevant and interpretable `summary` for Bayesian models with categorical covariates and possibly interactions and continuous covariates estimated in `Stan`. The core functions are `stanova()`  which requires specifying which `rstanarm` function should be called through argument `model_fun` (e.g., `model_fun = glmer` calls `stan_glmer` and allows fitting Bayesian mixed models) and `stanova_brm()` which estimates models using `brms::brm()`.
 
 The issue `stanova` tries to address is that categorical variables with $k$ levels need to be transformed into $k-1$ numerical model coefficients. This poses a problem if a model includes a factor with more than two levels that interacts with another variable. In this case, the most reasonable parameterization of the model is such that the intercept correspond to the (unweighted) grand mean and therefore estimates of the coefficients for the main effects represent average effects (compared to simple effects). In this parameterization, factors with $k$ levels, where $k > 2$ (i.e., more than two levels), cannot be mapped in a 1-to-1 fashion to the $k-1$ coefficients as no such mapping exists. Thus, the estimates of the model coefficients do not represent effects of one factor level, but always pertain to more than one factor level and thus cannot be directly interpreted. In other words, these coefficients should not be looked at. Instead, `stanova` transforms these parameters back such that one gets the information on the factor levels (or combination of factor levels for interactions). The default output shows for each factor level the difference from the intercept which as discussed before corresponds to the (unweighted) grand mean.
 
@@ -35,20 +35,20 @@ For the moment, you can only install the development version from [GitHub](https
 devtools::install_github("bayesstuff/stanova")
 ```
 
-**`stanova` requires `rstanarm` version `2.21.2` which is not yet on CRAN, but must be installed from source**:
+`stanova` attaches the new contrasts to the model instead of to the data if `rstanarm` version `2.21.2`, which is not yet on CRAN, is installed from source:
 
 ``` r
 Sys.setenv("MAKEFLAGS" = "-j4")  ## uses 4 cores during installation
 devtools::install_github("stan-dev/rstanarm", build_vignettes = FALSE)
 ```
 
-Also, at least version `1.4.7` of `emmeans` is needed which can be installed from CRAN:
+Also, at least version `1.5.0` of `emmeans` is needed which can be installed from CRAN:
 ``` r
 install.packages("emmeans")
 ```
 
 
-## Example
+## `rstanarm` Example
 
 The most basic example only uses a single factor with three levels to demonstrate the output. 
 
@@ -92,6 +92,31 @@ This makes it easy to produce plots via the `bayesplot` package on the level of 
 
 ```{r, fig.width=8, fig.height=3}
 bayesplot::mcmc_trace(out_array2$Machine)
+```
+
+## `brms` Example
+
+We can use the same example for `brms`. 
+
+```{r fit-brms, results='hide', message=FALSE, warning=FALSE}
+library(stanova)
+data("Machines", package = "MEMSS")
+
+m_machines_brm <- stanova_brm(score ~ Machine + (Machine|Worker),
+                              data=Machines, chains = 2,
+                              warmup = 250, iter = 750)
+```
+
+The `summary` methods works the same. The default shows the difference from the intercept.
+
+```{r}
+summary(m_machines_brm)
+```
+
+And we can get the estimated marginal means using `diff_intercept = FALSE`.
+
+```{r}
+summary(m_machines_brm, diff_intercept = FALSE)
 ```
 
 

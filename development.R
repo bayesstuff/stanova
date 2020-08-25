@@ -4,8 +4,8 @@ load_all()
 document()
 
 library("testthat")
-test()
-check()
+devtools::test()
+devtools::check()
 
 ### basic package things
 usethis::use_build_ignore("development.R")
@@ -13,7 +13,7 @@ usethis::use_build_ignore("examples/")
 
 use_package("rstanarm")
 use_package("lme4")
-use_package("emmeans")
+use_package("emmeans", type = "Depends")
 use_package("rstan")
 use_package("MASS")
 
@@ -23,6 +23,7 @@ use_package("glmmTMB", type = "Suggests")
 use_package("bayesplot", type = "Suggests")
 use_package("tidyverse", type = "Suggests")
 use_test("stanova")
+use_test("stanova_brm")
 
 library(usethis)
 

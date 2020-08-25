@@ -34,9 +34,11 @@ stanova_samples.stanova <- function(
   ...
 ) {
   return <- match.arg(return)
-  #browser()
   if (inherits(object, "brmsfit")) {
-    all_terms <- stats::terms(lme4::nobars(object$formula$formula))
+    all_terms <- tryCatch(
+      expr = stats::terms(lme4::nobars(object$formula$formula)),
+      error = function(e) stats::terms(object$formula$formula)
+    )
   } else if (inherits(object, "stanreg")) {
     all_terms <- stats::terms(lme4::nobars(object$formula))
   } else {
@@ -52,14 +54,22 @@ stanova_samples.stanova <- function(
   names(term2) <- terms_chr
 
   ### extract samples as arrays
-  post_intercept <- safe_get_stanova_samples(
-    term = "1",
-    object = object,
-    diff_intercept = FALSE,
-    intercept_array = NULL,
-    dimension_chain = dimension_chain
-  )
-  #extract_array_rstanarm(object, pars = "(Intercept)")
+  # post_intercept <- safe_get_stanova_samples(
+  #   term = "1",
+  #   object = object,
+  #   diff_intercept = FALSE,
+  #   intercept_array = NULL,
+  #   dimension_chain = dimension_chain
+  # )
+  if (inherits(object, "brmsfit")) {
+    post_intercept <- extract_posterior_array(object,
+                                              pars = "b_Intercept", fixed = TRUE)
+    dimnames(post_intercept)$Parameter <- "(Intercept)"
+  } else {
+    post_intercept <- extract_posterior_array(object, pars = "(Intercept)")
+  }
+
+  ## warning: using emmeans(object, term = "1") does not extract the intercept!
 
   post_diff <- lapply(term2, safe_get_stanova_samples,
                       object = object,
@@ -110,8 +120,7 @@ stanova_samples.stanova <- function(
       )[, c("Term", "Parameter", "Value", "Chain", "Iteration")]
       colnames(out[[i]])[2] <- "Variable"
       out[[i]]$Iteration <- as.numeric(as.character(out[[i]]$Iteration))
-      out[[i]]$Chain <- as.numeric(substr(out[[i]]$Chain,
-                                          start = 7, stop = 1e6))
+      out[[i]]$Chain <- as.numeric(out[[i]]$Chain)
       out[[i]]$Draw <- max(out[[i]]$Iteration) * (out[[i]]$Chain - 1) +
         out[[i]]$Iteration
       attr(out[[i]], "estimate") <- type_est
@@ -139,10 +148,18 @@ get_stanova_samples <- function(term, object, diff_intercept,
     names_num_vars <- names(num_vars)[num_vars]
   }
   if (any(num_vars)) {
-    sd_num <- apply(object[["data"]][,names_num_vars,drop = FALSE], 2, sd)
+    sd_num <- apply(object[["data"]][,names_num_vars,drop = FALSE], 2,
+                    stats::sd)
     mean_num <- apply(object[["data"]][,names_num_vars,drop = FALSE], 2, mean)
     if (length(term) == 1) {
-      tmp <- extract_array_rstanarm(object, pars = term)
+      if (inherits(object, "brmsfit")) {
+        tmp <- extract_posterior_array(object,
+                                       pars = paste0("b_", term),
+                                       fixed = TRUE)
+        dimnames(tmp)[[2]] <- substr(dimnames(tmp)[[2]], 3, 1e6)
+      } else if (inherits(object, "stanreg")) {
+        tmp <- extract_posterior_array(object, pars = term)
+      }
       attr(tmp, "estimate") <- paste0("trend ('", term, "')")
     } else {
       i <- 1 ## which numerical variable is chosen, default is 1
@@ -207,10 +224,6 @@ get_stanova_samples <- function(term, object, diff_intercept,
         attr(tmp, "estimate") <- "difference from intercept"
       } else {
         attr(tmp, "estimate") <- "marginal means"
-        if (dimnames(tmp)[[2]][1] == "1 overall") {
-          dimnames(tmp)[[2]][1] <- "(Intercept)"
-          attr(tmp, "estimate") <- NULL
-        }
       }
       dimnames(tmp)[[3]] <- dimnames(intercept_array)[[3]]
       names(dimnames(tmp)) <- names(dimnames(intercept_array))
@@ -248,10 +261,12 @@ safe_get_stanova_samples <- function(term, object, diff_intercept,
   )
 }
 
-extract_array_rstanarm <- function(object, pars) {
-  post <- as.array(object, pars = pars)
+
+extract_posterior_array <- function(object, pars, ...) {
+  post <- as.array(object, pars = pars, ...)
   post <- aperm(post, perm = c(1, 3, 2))
   names(dimnames(post)) <- c("Iteration", "Parameter", "Chain")
   dimnames(post)[[1]] <- as.character(seq_len(dim(post)[1]))
+  dimnames(post)[[3]] <- as.character(seq_len(dim(post)[3]))
   post
 }
