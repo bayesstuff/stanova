@@ -5,7 +5,6 @@ summary.stanova <- function(object,
                             probs = c(0.05, 0.5, 0.95),
                             ...,
                             digits = 3L) {
-  #browser()
   ## get summaries:
   matrix_diff <- stanova_samples(object,
                                  diff_intercept = diff_intercept,
@@ -57,25 +56,50 @@ summary.stanova <- function(object,
   class(tmp) <- class(tmp)[class(tmp) != "stanova"]
   tmp2 <- summary(tmp)
 
-  ## prepare return object as summary.stanreg
-  structure(
-    out,
-    call = object$call,
-    algorithm = object$algorithm,
-    stan_function = object$stan_function,
-    family = attr(tmp2, "family"),
-    formula = formula(object),
-    posterior_sample_size = attr(tmp2, "posterior_sample_size"),
-    nchain = length(object$stanfit@stan_args),
-    nobs = attr(tmp2, "nobs"),
-    npreds = attr(tmp2, "npreds"),
-    ngrps = attr(tmp2, "ngrps"),
-    estimate = unlist(lapply(array_diff, function(x) attr(x, "estimate"))),
-    print.digits = digits,
-    priors = object$prior.info,
-    no_ppd_diagnostic = attr(tmp2, "no_ppd_diagnostic"),
-    class = "summary.stanova"
-  )
+  if (inherits(object, "brmsfit")) {
+    ## prepare return object as summary.stanreg
+    out <- structure(
+      out,
+      call = object$call,
+      algorithm = object$algorithm,
+      stan_function = "brms::brm",
+      family = summary(family(object)),
+      formula = tmp2$formula$formula,
+      posterior_sample_size = (tmp2$iter - tmp2$warmup) * tmp2$chains,
+      nchain = tmp2$chains,
+      nobs = tmp2$nobs,
+      npreds = NULL,
+      ngrps = tmp2$ngrps,
+      estimate = unlist(lapply(array_diff, function(x) attr(x, "estimate"))),
+      print.digits = digits,
+      priors = "Use brms::prior_summary(object) for prior information", #"No priors specified", #tmp2$prior,
+      no_ppd_diagnostic = NULL,
+      class = "summary.stanova"
+    )
+  } else if (inherits(object, "stanreg")) {
+    ## prepare return object as summary.stanreg
+    out <- structure(
+      out,
+      call = object$call,
+      algorithm = object$algorithm,
+      stan_function = object$stan_function,
+      family = attr(tmp2, "family"),
+      formula = formula(object),
+      posterior_sample_size = attr(tmp2, "posterior_sample_size"),
+      nchain = length(object$stanfit@stan_args),
+      nobs = attr(tmp2, "nobs"),
+      npreds = attr(tmp2, "npreds"),
+      ngrps = attr(tmp2, "ngrps"),
+      estimate = unlist(lapply(array_diff, function(x) attr(x, "estimate"))),
+      print.digits = digits,
+      priors = "see help('prior_summary', package = 'rstanarm')", #object$prior.info,
+      no_ppd_diagnostic = attr(tmp2, "no_ppd_diagnostic"),
+      class = "summary.stanova"
+    )
+  } else {
+    stop("not supported model.", call. = FALSE)
+  }
+  out
 }
 
 formula_string <- function (formula, break_and_indent = TRUE)
@@ -104,7 +128,7 @@ print.summary.stanova <-
       cat("\n sample:      ", atts$posterior_sample_size,
           "(posterior sample size)")
     }
-    cat("\n priors:      ", "see help('prior_summary', package = 'rstanarm')")
+    cat("\n priors:      ", atts$priors)
 
     cat("\n observations:", atts$nobs)
     if (!is.null(atts$npreds)) {

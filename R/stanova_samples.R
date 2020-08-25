@@ -207,6 +207,10 @@ get_stanova_samples <- function(term, object, diff_intercept,
         attr(tmp, "estimate") <- "difference from intercept"
       } else {
         attr(tmp, "estimate") <- "marginal means"
+        if (dimnames(tmp)[[2]][1] == "1 overall") {
+          dimnames(tmp)[[2]][1] <- "(Intercept)"
+          attr(tmp, "estimate") <- NULL
+        }
       }
       dimnames(tmp)[[3]] <- dimnames(intercept_array)[[3]]
       names(dimnames(tmp)) <- names(dimnames(intercept_array))
