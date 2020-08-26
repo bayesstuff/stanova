@@ -1,6 +1,6 @@
 Package: stanova
 Title: Bayesian Models with Categorical Variables
-Version: 0.2-0
+Version: 0.3-0
 Authors@R: 
     c(person(given = "Henrik",
            family = "Singmann",
@@ -22,8 +22,6 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Imports: 
-    rstanarm,
-    emmeans (>= 1.5.0),
     lme4,
     coda,
     rstan,
@@ -31,6 +29,8 @@ Imports:
     MASS
 Suggests: 
     testthat (>= 2.1.0),
+    rstanarm,
+    brms,
     MEMSS,
     afex,
     glmmTMB,
@@ -38,3 +38,5 @@ Suggests:
     tibble,
     tidybayes,
     tidyverse
+Depends: 
+    emmeans

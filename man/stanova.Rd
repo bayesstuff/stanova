@@ -10,7 +10,7 @@ stanova(
   model_fun,
   ...,
   check_contrasts = "contr.bayes",
-  pass_contrasts = TRUE
+  pass_contrasts = if (packageVersion("rstanarm") >= "2.21.2") TRUE else FALSE
 )
 }
 \arguments{

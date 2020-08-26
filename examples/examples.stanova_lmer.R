@@ -68,3 +68,4 @@ gm1 <- stanova(count~spp * mined + (1 | site), data = Salamanders,
                family = "poisson", model_fun = "glmer",
                chains = 2, cores = 1, seed = 12345, iter = 500)
 summary(gm1)
+

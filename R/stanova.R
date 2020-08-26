@@ -20,6 +20,7 @@
 #'   or `core`.
 #'
 #' @example examples/examples.stanova.R
+#' @importFrom utils packageVersion
 #'
 #' @export
 stanova <- function(
@@ -39,6 +40,9 @@ stanova <- function(
   # }
 
   if (!is.null(check_contrasts)) {
+    if (!requireNamespace("rstanarm")) {
+      stop("Package rstanarm is required.", call. = FALSE)
+    }
     if (pass_contrasts) {
       contrasts_list <- create_contrasts_list(formula = formula, data = data,
                             new_contrast = check_contrasts)
@@ -71,4 +75,6 @@ stanova <- function(
   class(mout) <- c("stanova", class(mout))
   return(mout)
 }
+
+
 

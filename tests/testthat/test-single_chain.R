@@ -24,5 +24,12 @@ test_that("Single chains work as expected", {
 
   df <- stanova_samples(m_machines_1, return = "data.frame")
   expect_is(df$`(Intercept)`, "data.frame")
+  expect_equal(df[["(Intercept)"]]$Chain, rep(1, nrow(df[["(Intercept)"]])))
+  expect_equal(df[["(Intercept)"]]$Iteration, seq_len(nrow(df[["(Intercept)"]])))
+  expect_equal(df[["(Intercept)"]]$Draw, seq_len(nrow(df[["(Intercept)"]])))
   expect_is(df$Machine, "data.frame")
+  expect_equal(df[["Machine"]]$Chain, rep(1, nrow(df[["Machine"]])))
+  expect_equal(df[["Machine"]]$Iteration, rep(seq_len(nrow(df[["(Intercept)"]])), 3))
+  expect_equal(df[["Machine"]]$Draw, rep(seq_len(nrow(df[["(Intercept)"]])), 3))
+
 })

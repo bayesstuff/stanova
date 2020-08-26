@@ -1,6 +1,6 @@
 #' @importFrom stats as.formula contrasts<- formula
 check_contrasts <- function(formula, data, new_contrast) {
-  vars.to.check <- all.vars(as.formula(formula))
+  vars.to.check <- all.vars(lme4::nobars(as.formula(formula)))
   resetted <- NULL
   for (i in vars.to.check) {
     if (is.character(data[,i])) {

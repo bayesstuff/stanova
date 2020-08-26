@@ -13,10 +13,11 @@ status](https://github.com/bayesstuff/stanova/workflows/R-CMD-check/badge.svg)](
 
 The goal of `stanova` is to provide a more relevant and interpretable
 `summary` for Bayesian models with categorical covariates and possibly
-interactions. The core function is `stanova()` which requires specifying
-which `rstanarm` function should be called through argument `model_fun`
-(e.g., `model_fun = glmer` calls `stan_glmer` and allows fitting
-Bayesian mixed models).
+interactions and continuous covariates estimated in `Stan`. The core
+functions are `stanova()` which requires specifying which `rstanarm`
+function should be called through argument `model_fun` (e.g., `model_fun
+= glmer` calls `stan_glmer` and allows fitting Bayesian mixed models)
+and `stanova_brm()` which estimates models using `brms::brm()`.
 
 The issue `stanova` tries to address is that categorical variables with
 \(k\) levels need to be transformed into \(k-1\) numerical model
@@ -61,26 +62,35 @@ For the moment, you can only install the development version from
 [GitHub](https://github.com/) with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("bayesstuff/stanova")
+# install.packages("remotes")
+remotes::install_github("bayesstuff/stanova")
 ```
 
-**`stanova` requires `rstanarm` version `2.21.2` which is not yet on
-CRAN, but must be installed from source**:
-
-``` r
-Sys.setenv("MAKEFLAGS" = "-j4")  ## uses 4 cores during installation
-devtools::install_github("stan-dev/rstanarm", build_vignettes = FALSE)
-```
-
-Also, at least version `1.4.7` of `emmeans` is needed which can be
-installed from CRAN:
+At least version `1.5.0` of `emmeans` is needed which can be installed
+from CRAN:
 
 ``` r
 install.packages("emmeans")
 ```
 
-## Example
+For the `brms` support, in addition to a C++ compiler, the latest
+development version of `brms` is needed. This needs to be installed from
+GitHub for now:
+
+``` r
+remotes::install_github("paul-buerkner/brms")
+```
+
+For the `rstanarm` fucntionality, `stanova` attaches the new contrasts
+to the model instead of to the data if `rstanarm` version `2.21.2`,
+which is not yet on CRAN, is installed from source:
+
+``` r
+Sys.setenv("MAKEFLAGS" = "-j4")  ## uses 4 cores during installation
+remotes::install_github("stan-dev/rstanarm", build_vignettes = FALSE)
+```
+
+## `rstanarm` Example
 
 The most basic example only uses a single factor with three levels to
 demonstrate the output.
@@ -120,14 +130,14 @@ summary(m_machines)
 #> 
 #> Estimate Intercept:
 #>      Variable   Mean MAD_SD     5%    50%    95%  rhat ess_bulk ess_tail
-#> 1 (Intercept) 59.459  1.848 56.052 59.472 62.716 1.001  336.289  417.863
+#> 1 (Intercept) 59.822  1.741 56.774 59.815 62.846 1.007  301.177  419.510
 #> 
 #> 
 #> Estimates 'Machine' - difference from intercept:
 #>    Variable   Mean MAD_SD     5%    50%    95%  rhat ess_bulk ess_tail
-#> 1 Machine A -7.214  0.871 -8.840 -7.218 -5.596 1.004  365.941  377.609
-#> 2 Machine B  0.567  1.331 -1.744  0.521  2.861 1.003  405.820  502.891
-#> 3 Machine C  6.647  1.121  4.551  6.650  8.756 1.001  428.091  467.198
+#> 1 Machine A -7.232  1.252 -9.484 -7.184 -5.024 1.006  360.512  490.292
+#> 2 Machine B  0.628  1.330 -1.598  0.587  3.000 1.011  392.514  523.328
+#> 3 Machine C  6.603  1.091  4.467  6.608  8.563 1.005  347.099  342.109
 ```
 
 If one is not interested in the differences from the factor levels, it
@@ -150,14 +160,14 @@ summary(m_machines, diff_intercept = FALSE)
 #> 
 #> Estimate Intercept:
 #>      Variable   Mean MAD_SD     5%    50%    95%  rhat ess_bulk ess_tail
-#> 1 (Intercept) 59.459  1.848 56.052 59.472 62.716 1.001  336.289  417.863
+#> 1 (Intercept) 59.822  1.741 56.774 59.815 62.846 1.007  301.177  419.510
 #> 
 #> 
 #> Estimates 'Machine' - marginal means:
 #>    Variable   Mean MAD_SD     5%    50%    95%  rhat ess_bulk ess_tail
-#> 1 Machine A 52.245  1.609 49.331 52.214 55.116 1.003  334.418  541.982
-#> 2 Machine B 60.026  2.926 55.259 59.966 64.771 1.000  337.456  336.202
-#> 3 Machine C 66.106  1.902 62.687 66.122 69.565 1.005  396.441  540.749
+#> 1 Machine A 52.591  1.679 49.584 52.620 55.915 1.002  369.999  373.980
+#> 2 Machine B 60.451  2.613 55.720 60.500 65.445 1.011  302.915  452.468
+#> 3 Machine C 66.426  1.877 63.311 66.352 69.710 1.004  321.080  409.438
 ```
 
 The key to the output is the `stanova_samples()` function which takes a
@@ -171,16 +181,16 @@ the `return` argument.
 out_array <- stanova_samples(m_machines)
 str(out_array)
 #> List of 2
-#>  $ (Intercept): num [1:500, 1, 1:2] 59.3 60.5 62.2 61 58.7 ...
+#>  $ (Intercept): num [1:500, 1, 1:2] 60.5 60 60.8 59.8 60 ...
 #>   ..- attr(*, "dimnames")=List of 3
 #>   .. ..$ Iteration: chr [1:500] "1" "2" "3" "4" ...
 #>   .. ..$ Parameter: chr "(Intercept)"
-#>   .. ..$ Chain    : chr [1:2] "chain:1" "chain:2"
-#>  $ Machine    : num [1:500, 1:3, 1:2] -7.22 -7.76 -8.57 -8.02 -8.25 ...
+#>   .. ..$ Chain    : chr [1:2] "1" "2"
+#>  $ Machine    : num [1:500, 1:3, 1:2] -5.36 -7.86 -7.27 -7.66 -7.74 ...
 #>   ..- attr(*, "dimnames")=List of 3
 #>   .. ..$ Iteration: chr [1:500] "1" "2" "3" "4" ...
 #>   .. ..$ Parameter: chr [1:3] "Machine A" "Machine B" "Machine C"
-#>   .. ..$ Chain    : chr [1:2] "chain:1" "chain:2"
+#>   .. ..$ Chain    : chr [1:2] "1" "2"
 #>   ..- attr(*, "estimate")= chr "difference from intercept"
 ```
 
@@ -191,15 +201,15 @@ via the `dimension_chain` argument.
 out_array2 <- stanova_samples(m_machines, dimension_chain = 2)
 str(out_array2)
 #> List of 2
-#>  $ (Intercept): num [1:500, 1:2, 1] 59.3 60.5 62.2 61 58.7 ...
+#>  $ (Intercept): num [1:500, 1:2, 1] 60.5 60 60.8 59.8 60 ...
 #>   ..- attr(*, "dimnames")=List of 3
 #>   .. ..$ Iteration: chr [1:500] "1" "2" "3" "4" ...
-#>   .. ..$ Chain    : chr [1:2] "chain:1" "chain:2"
+#>   .. ..$ Chain    : chr [1:2] "1" "2"
 #>   .. ..$ Parameter: chr "(Intercept)"
-#>  $ Machine    : num [1:500, 1:2, 1:3] -7.22 -7.76 -8.57 -8.02 -8.25 ...
+#>  $ Machine    : num [1:500, 1:2, 1:3] -5.36 -7.86 -7.27 -7.66 -7.74 ...
 #>   ..- attr(*, "dimnames")=List of 3
 #>   .. ..$ Iteration: chr [1:500] "1" "2" "3" "4" ...
-#>   .. ..$ Chain    : chr [1:2] "chain:1" "chain:2"
+#>   .. ..$ Chain    : chr [1:2] "1" "2"
 #>   .. ..$ Parameter: chr [1:3] "Machine A" "Machine B" "Machine C"
 #>   ..- attr(*, "estimate")= chr "difference from intercept"
 ```
@@ -212,6 +222,83 @@ bayesplot::mcmc_trace(out_array2$Machine)
 ```
 
 <img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
+
+## `brms` Example
+
+We can use the same example for `brms`.
+
+``` r
+library(stanova)
+data("Machines", package = "MEMSS")
+
+m_machines_brm <- stanova_brm(score ~ Machine + (Machine|Worker),
+                              data=Machines, chains = 2,
+                              warmup = 250, iter = 750)
+```
+
+The `summary` methods works the same. The default shows the difference
+from the intercept.
+
+``` r
+summary(m_machines_brm)
+#> Warning: There were 2 divergent transitions after warmup. Increasing adapt_delta
+#> above 0.8 may help. See http://mc-stan.org/misc/warnings.html#divergent-
+#> transitions-after-warmup
+#> 
+#> Model Info:
+#>  function:     brms::brm
+#>  family:       gaussian(identity)
+#>  formula:      score ~ Machine + (Machine | Worker)
+#>  algorithm:    sampling
+#>  chains:       2
+#>  sample:       1000 (posterior sample size)
+#>  priors:       Use brms::prior_summary(object) for prior information
+#>  observations: 54
+#>  groups:       Worker (6)
+#> 
+#> Estimate Intercept:
+#>      Variable   Mean MAD_SD     5%    50%    95%  rhat ess_bulk ess_tail
+#> 1 (Intercept) 59.915  2.169 56.284 59.900 64.193 1.004  430.852  379.244
+#> 
+#> 
+#> Estimates 'Machine' - difference from intercept:
+#>    Variable   Mean MAD_SD     5%    50%    95%  rhat ess_bulk ess_tail
+#> 1 Machine A -7.394  1.223 -9.866 -7.338 -4.881 1.002  585.078  520.365
+#> 2 Machine B  0.771  1.575 -2.195  0.797  3.642 1.006  478.505  557.933
+#> 3 Machine C  6.623  1.413  3.951  6.579  9.436 1.004  621.441  634.558
+```
+
+And we can get the estimated marginal means using `diff_intercept =
+FALSE`.
+
+``` r
+summary(m_machines_brm, diff_intercept = FALSE)
+#> Warning: There were 2 divergent transitions after warmup. Increasing adapt_delta
+#> above 0.8 may help. See http://mc-stan.org/misc/warnings.html#divergent-
+#> transitions-after-warmup
+#> 
+#> Model Info:
+#>  function:     brms::brm
+#>  family:       gaussian(identity)
+#>  formula:      score ~ Machine + (Machine | Worker)
+#>  algorithm:    sampling
+#>  chains:       2
+#>  sample:       1000 (posterior sample size)
+#>  priors:       Use brms::prior_summary(object) for prior information
+#>  observations: 54
+#>  groups:       Worker (6)
+#> 
+#> Estimate Intercept:
+#>      Variable   Mean MAD_SD     5%    50%    95%  rhat ess_bulk ess_tail
+#> 1 (Intercept) 59.915  2.169 56.284 59.900 64.193 1.004  430.852  379.244
+#> 
+#> 
+#> Estimates 'Machine' - marginal means:
+#>    Variable   Mean MAD_SD     5%    50%    95%  rhat ess_bulk ess_tail
+#> 1 Machine A 52.521  2.207 48.114 52.549 56.595 1.003  496.900  395.046
+#> 2 Machine B 60.686  3.208 54.787 60.851 66.645 1.007  431.779  514.153
+#> 3 Machine C 66.538  2.417 62.450 66.501 71.325 1.007  459.667  440.038
+```
 
 # References
 
