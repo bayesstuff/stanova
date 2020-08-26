@@ -31,21 +31,29 @@ Another problem adressed by `stanova` is that for Bayesian models the mapping of
 For the moment, you can only install the development version from [GitHub](https://github.com/) with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("bayesstuff/stanova")
+# install.packages("remotes")
+remotes::install_github("bayesstuff/stanova")
 ```
 
-`stanova` attaches the new contrasts to the model instead of to the data if `rstanarm` version `2.21.2`, which is not yet on CRAN, is installed from source:
-
-``` r
-Sys.setenv("MAKEFLAGS" = "-j4")  ## uses 4 cores during installation
-devtools::install_github("stan-dev/rstanarm", build_vignettes = FALSE)
-```
-
-Also, at least version `1.5.0` of `emmeans` is needed which can be installed from CRAN:
+At least version `1.5.0` of `emmeans` is needed which can be installed from CRAN:
 ``` r
 install.packages("emmeans")
 ```
+
+For the `brms` support, in addition to a C++ compiler, the latest development version of `brms` is needed. This needs to be installed from GitHub for now:
+
+```r
+remotes::install_github("paul-buerkner/brms")
+```
+
+For the `rstanarm` fucntionality, `stanova` attaches the new contrasts to the model instead of to the data if `rstanarm` version `2.21.2`, which is not yet on CRAN, is installed from source:
+
+``` r
+Sys.setenv("MAKEFLAGS" = "-j4")  ## uses 4 cores during installation
+remotes::install_github("stan-dev/rstanarm", build_vignettes = FALSE)
+```
+
+
 
 
 ## `rstanarm` Example
