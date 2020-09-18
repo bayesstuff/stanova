@@ -47,8 +47,8 @@ stanova <- function(
       contrasts_list <- create_contrasts_list(formula = formula, data = data,
                             new_contrast = check_contrasts)
     } else {
-      data <- check_contrasts(formula = formula, data = data,
-                              new_contrast = check_contrasts)
+      data <- check_contrasts_fun(formula = formula, data = data,
+                                  new_contrast = check_contrasts)
     }
   }
 

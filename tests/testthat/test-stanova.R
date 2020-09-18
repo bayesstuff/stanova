@@ -31,6 +31,27 @@ test_that("Basics Works without Warnings", {
   expect_equivalent(sum2$`wool:tension`$Mean[1], 45.5,
                     tolerance = 2, scale = 1)
 
+  capture.output(
+    fit_warp2 <- stanova(breaks ~ wool * tension, data = warpbreaks,
+                         #prior = rstanarm::student_t(3, 0, 3, autoscale = FALSE),
+                         model_fun = "glm",
+                         chains = 2, iter = 1000,
+                         check_contrasts = contr.bayes)
+  )
+
+  sum1 <- summary(fit_warp2, diff_intercept = TRUE)
+  expect_equivalent(sum1$`(Intercept)`$Mean, 28.1, tolerance = 0.4)
+
+  sum2 <- summary(fit_warp2, diff_intercept = FALSE)
+  expect_equivalent(sum2$`(Intercept)`$Mean,
+                    coef(modlm,)[1],
+                    tolerance = 1, scale = 1)
+  expect_equivalent(sum2$`wool:tension`$Mean,
+                    summary(emmeans::emmeans(modlm, c("wool", "tension")))$emmean,
+                    tolerance = 1, scale = 1)
+  expect_equivalent(sum2$`wool:tension`$Mean[1], 45.5,
+                    tolerance = 2, scale = 1)
+
 })
 
 test_that("Binomial GLM works", {
