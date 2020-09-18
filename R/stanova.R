@@ -7,9 +7,10 @@
 #'   should be used for fitting (omitting the `stan_` prefix) such as `"glm"` or
 #'   `"glmer"`.
 #' @param check_contrasts `character` string (of length 1) denoting a contrast
-#'   function which should be assigned to all `character` and `factor` variables
-#'   in the model (as long as the specified contrast is not the global default).
-#'   Default is [contr.bayes]. Set to `NULL` to disable the check.
+#'   function or a contrast function which should be assigned to all `character`
+#'   and `factor` variables in the model (as long as the specified contrast is
+#'   not the global default). Default is [contr.bayes]. Set to `NULL` to disable
+#'   the check.
 #' @param pass_contrasts If `TRUE`, assigned (or checked) contrasts are passed
 #'   to the modelling function as a `list`. If `FALSE`, assigned contrasts are
 #'   added to the passed `data` object and this object is passed to the

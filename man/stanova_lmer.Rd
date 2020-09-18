@@ -16,9 +16,10 @@ to \code{rstanarm::stan_g/lmer}.}
 \item{data}{\code{data.frame} containing the data.}
 
 \item{check_contrasts}{\code{character} string (of length 1) denoting a contrast
-function which should be assigned to all \code{character} and \code{factor} variables
-in the model (as long as the specified contrast is not the global default).
-Default is \link{contr.bayes}. Set to \code{NULL} to disable the check.}
+function or a contrast function which should be assigned to all \code{character}
+and \code{factor} variables in the model (as long as the specified contrast is
+not the global default). Default is \link{contr.bayes}. Set to \code{NULL} to disable
+the check.}
 
 \item{...}{further arguments passed to the \code{rstanarm} function used for
 fitting. Typical arguments are \code{prior}, \code{prior_intercept}, \code{chain}, \code{iter},
