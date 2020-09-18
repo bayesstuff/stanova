@@ -25,9 +25,9 @@ stanova_brm <- function(
   # }
 
   if (!is.null(check_contrasts)) {
-    data <- check_contrasts(formula = as.formula(formula),
-                            data = data,
-                            new_contrast = check_contrasts)
+    data <- check_contrasts_fun(formula = as.formula(formula),
+                                data = data,
+                                new_contrast = check_contrasts)
   }
 
 
