@@ -3,21 +3,21 @@ check_contrasts_fun <- function(formula, data, new_contrast) {
   vars.to.check <- all.vars(lme4::nobars(as.formula(formula)))
   resetted <- NULL
   for (i in vars.to.check) {
-    if (is.character(data[,i])) {
-      data[,i] <- factor(data[,i])
+    if (is.character(data[[i]])) {
+      data[,i] <- factor(data[[i]])
     }
-    if (is.factor(data[,i])) {
+    if (is.factor(data[[i]])) {
       if (!is.character(new_contrast) || (
         (
-          is.null(attr(data[,i], "contrasts")) &
+          is.null(attr(data[[i]], "contrasts")) &
           (options("contrasts")[[1]][1] != new_contrast)
         ) ||
         (
-          !is.null(attr(data[,i], "contrasts")) &&
-          attr(data[,i], "contrasts") != new_contrast
+          !is.null(attr(data[[i]], "contrasts")) &&
+          attr(data[[i]], "contrasts") != new_contrast
         )
       )) {
-        contrasts(data[,i]) <- new_contrast
+        contrasts(data[[i]]) <- new_contrast
         resetted  <- c(resetted, i)
       }
     }
@@ -39,14 +39,14 @@ create_contrasts_list <- function(formula, data, new_contrast) {
   resetted <- NULL
   outlist <- list()
   for (i in vars.to.check) {
-    if (is.character(data[,i]) | is.factor(data[,i])) {
-      if (is.null(attr(data[,i], "contrasts")) &
+    if (is.character(data[[i]]) | is.factor(data[,i])) {
+      if (is.null(attr(data[[i]], "contrasts")) &
           (options("contrasts")[[1]][1] != new_contrast)) {
         outlist[[i]] <- new_contrast
         resetted  <- c(resetted, i)
       }
       else if (!is.null(attr(data[,i], "contrasts")) &&
-               attr(data[,i], "contrasts") != new_contrast) {
+               attr(data[[i]], "contrasts") != new_contrast) {
         outlist[[i]] <- new_contrast
         resetted  <- c(resetted, i)
       }
