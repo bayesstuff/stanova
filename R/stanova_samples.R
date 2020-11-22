@@ -35,10 +35,10 @@ stanova_samples.stanova <- function(
 ) {
   return <- match.arg(return)
   if (inherits(object, "brmsfit")) {
-    all_terms <- tryCatch(
-      expr = stats::terms(lme4::nobars(object$formula$formula)),
-      error = function(e) stats::terms(object$formula$formula)
-    )
+    if (!requireNamespace("brms")) {
+      stop("Package brms is required.", call. = FALSE)
+    }
+    all_terms <- stats::terms(brms::brmsterms(object$formula)$dpars$mu$fe)
   } else if (inherits(object, "stanreg")) {
     all_terms <- stats::terms(lme4::nobars(object$formula))
   } else {
