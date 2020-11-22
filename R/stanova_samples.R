@@ -49,6 +49,8 @@ stanova_samples.stanova <- function(
     # if (length(terms[ !(terms %in% terms2)]) > 0)
     #   warning("Terms ", terms[ !(terms %in% terms2)], " not in model.")
     terms_chr <- terms[ terms %in% terms_chr]
+  } else {
+    terms_chr <- terms_chr[!grepl("\\|", terms_chr)]
   }
   term2 <- strsplit(terms_chr, split = ":")
   names(term2) <- terms_chr
