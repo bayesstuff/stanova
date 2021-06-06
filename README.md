@@ -74,12 +74,11 @@ from CRAN:
 install.packages("emmeans")
 ```
 
-For the `brms` support, in addition to a C++ compiler, the latest
-development version of `brms` is needed. This needs to be installed from
-GitHub for now:
+For the `brms` support, in addition to a C++ compiler, at least `brms`
+version `2.15.0` is needed. This can be installed from CRAN for now:
 
 ``` r
-remotes::install_github("paul-buerkner/brms")
+install.packages("brms")
 ```
 
 For the `rstanarm` fucntionality, `stanova` attaches the new contrasts
@@ -131,14 +130,14 @@ summary(m_machines)
 #> 
 #> Estimate Intercept:
 #>      Variable   Mean MAD_SD     5%    50%    95%  rhat ess_bulk ess_tail
-#> 1 (Intercept) 59.544  1.858 56.203 59.551 63.131 1.007  309.309  356.113
+#> 1 (Intercept) 59.722  1.807 56.366 59.670 63.034 1.021  226.845  414.380
 #> 
 #> 
 #> Estimates 'Machine' - difference from intercept:
 #>    Variable   Mean MAD_SD     5%    50%    95%  rhat ess_bulk ess_tail
-#> 1 Machine A -7.202  1.279 -9.609 -7.132 -5.012 1.006  394.708  467.065
-#> 2 Machine B  0.663  1.311 -1.548  0.656  2.953 1.001  268.390  378.224
-#> 3 Machine C  6.540  1.148  4.578  6.497  8.753 1.004  296.233  306.291
+#> 1 Machine A -7.398  1.190 -9.570 -7.390 -5.265 1.002  293.763  440.176
+#> 2 Machine B  0.789  1.215 -1.391  0.734  3.157 0.999  306.112  445.466
+#> 3 Machine C  6.609  1.105  4.784  6.585  8.637 1.002  488.434  628.321
 ```
 
 If one is not interested in the differences from the factor levels, it
@@ -161,14 +160,14 @@ summary(m_machines, diff_intercept = FALSE)
 #> 
 #> Estimate Intercept:
 #>      Variable   Mean MAD_SD     5%    50%    95%  rhat ess_bulk ess_tail
-#> 1 (Intercept) 59.544  1.858 56.203 59.551 63.131 1.007  309.309  356.113
+#> 1 (Intercept) 59.722  1.807 56.366 59.670 63.034 1.021  226.845  414.380
 #> 
 #> 
 #> Estimates 'Machine' - marginal means:
 #>    Variable   Mean MAD_SD     5%    50%    95%  rhat ess_bulk ess_tail
-#> 1 Machine A 52.341  1.840 48.928 52.329 55.596 1.007  391.147  493.278
-#> 2 Machine B 60.207  2.795 55.185 60.134 65.504 1.005  248.027  381.530
-#> 3 Machine C 66.084  1.930 62.594 66.124 69.304 1.006  303.862  411.347
+#> 1 Machine A 52.324  1.739 49.218 52.312 55.831 1.025  186.573  466.659
+#> 2 Machine B 60.511  2.626 55.713 60.522 65.490 1.010  250.168  397.672
+#> 3 Machine C 66.331  1.946 63.081 66.319 69.727 1.013  282.753  376.227
 ```
 
 The key to the output is the `stanova_samples()` function which takes a
@@ -182,12 +181,12 @@ the `return` argument.
 out_array <- stanova_samples(m_machines)
 str(out_array)
 #> List of 2
-#>  $ (Intercept): num [1:500, 1, 1:2] 59.4 60.3 61.2 55.6 55.8 ...
+#>  $ (Intercept): num [1:500, 1, 1:2] 63.6 63.2 61.1 57.8 59.6 ...
 #>   ..- attr(*, "dimnames")=List of 3
 #>   .. ..$ Iteration: chr [1:500] "1" "2" "3" "4" ...
 #>   .. ..$ Parameter: chr "(Intercept)"
 #>   .. ..$ Chain    : chr [1:2] "1" "2"
-#>  $ Machine    : num [1:500, 1:3, 1:2] -7.84 -8.01 -8.92 -5.95 -6.91 ...
+#>  $ Machine    : num [1:500, 1:3, 1:2] -7.16 -6.93 -8.36 -5.85 -7.14 ...
 #>   ..- attr(*, "dimnames")=List of 3
 #>   .. ..$ Iteration: chr [1:500] "1" "2" "3" "4" ...
 #>   .. ..$ Parameter: chr [1:3] "Machine A" "Machine B" "Machine C"
@@ -202,12 +201,12 @@ via the `dimension_chain` argument.
 out_array2 <- stanova_samples(m_machines, dimension_chain = 2)
 str(out_array2)
 #> List of 2
-#>  $ (Intercept): num [1:500, 1:2, 1] 59.4 60.3 61.2 55.6 55.8 ...
+#>  $ (Intercept): num [1:500, 1:2, 1] 63.6 63.2 61.1 57.8 59.6 ...
 #>   ..- attr(*, "dimnames")=List of 3
 #>   .. ..$ Iteration: chr [1:500] "1" "2" "3" "4" ...
 #>   .. ..$ Chain    : chr [1:2] "1" "2"
 #>   .. ..$ Parameter: chr "(Intercept)"
-#>  $ Machine    : num [1:500, 1:2, 1:3] -7.84 -8.01 -8.92 -5.95 -6.91 ...
+#>  $ Machine    : num [1:500, 1:2, 1:3] -7.16 -6.93 -8.36 -5.85 -7.14 ...
 #>   ..- attr(*, "dimnames")=List of 3
 #>   .. ..$ Iteration: chr [1:500] "1" "2" "3" "4" ...
 #>   .. ..$ Chain    : chr [1:2] "1" "2"
@@ -259,14 +258,14 @@ summary(m_machines_brm)
 #> 
 #> Estimate Intercept:
 #>      Variable   Mean MAD_SD     5%    50%    95%  rhat ess_bulk ess_tail
-#> 1 (Intercept) 59.624  2.088 55.659 59.651 63.545 1.002  382.992  394.201
+#> 1 (Intercept) 59.987  2.356 55.798 59.980 64.233 1.005  391.109  378.052
 #> 
 #> 
 #> Estimates 'Machine' - difference from intercept:
 #>    Variable   Mean MAD_SD     5%    50%    95%  rhat ess_bulk ess_tail
-#> 1 Machine A -7.299  1.287 -9.633 -7.279 -4.741 1.002  579.371  734.007
-#> 2 Machine B  0.667  1.493 -2.235  0.622  3.686 0.999  497.840  465.746
-#> 3 Machine C  6.631  1.499  3.823  6.654  9.423 1.000  528.319  672.698
+#> 1 Machine A -7.275  1.376 -9.807 -7.339 -4.471 1.006  424.105  437.737
+#> 2 Machine B  0.704  1.673 -2.304  0.725  3.698 1.003  494.681  544.226
+#> 3 Machine C  6.570  1.481  3.991  6.559  9.155 1.000  541.001  568.342
 ```
 
 And we can get the estimated marginal means using
@@ -291,14 +290,14 @@ summary(m_machines_brm, diff_intercept = FALSE)
 #> 
 #> Estimate Intercept:
 #>      Variable   Mean MAD_SD     5%    50%    95%  rhat ess_bulk ess_tail
-#> 1 (Intercept) 59.624  2.088 55.659 59.651 63.545 1.002  382.992  394.201
+#> 1 (Intercept) 59.987  2.356 55.798 59.980 64.233 1.005  391.109  378.052
 #> 
 #> 
 #> Estimates 'Machine' - marginal means:
 #>    Variable   Mean MAD_SD     5%    50%    95%  rhat ess_bulk ess_tail
-#> 1 Machine A 52.325  2.198 48.244 52.380 56.185 0.999  347.682  501.531
-#> 2 Machine B 60.291  3.225 54.467 60.299 66.182 1.001  401.992  430.714
-#> 3 Machine C 66.255  2.461 62.197 66.093 70.772 1.003  530.649  685.704
+#> 1 Machine A 52.713  2.384 48.547 52.630 57.334 1.004  481.561  434.842
+#> 2 Machine B 60.692  3.382 54.488 60.605 66.948 1.001  387.032  347.542
+#> 3 Machine C 66.557  2.640 62.258 66.454 71.246 1.001  354.172  419.227
 ```
 
 # References

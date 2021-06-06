@@ -41,10 +41,10 @@ At least version `1.5.0` of `emmeans` is needed which can be installed from CRAN
 install.packages("emmeans")
 ```
 
-For the `brms` support, in addition to a C++ compiler, the latest development version of `brms` is needed. This needs to be installed from GitHub for now:
+For the `brms` support, in addition to a C++ compiler, at least `brms` version `2.15.0` is needed. This can be installed from CRAN for now:
 
 ```r
-remotes::install_github("paul-buerkner/brms")
+install.packages("brms")
 ```
 
 For the `rstanarm` fucntionality, `stanova` attaches the new contrasts to the model instead of to the data if `rstanarm` version `2.21.2`, which is not yet on CRAN, is installed from source:
