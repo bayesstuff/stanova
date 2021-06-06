@@ -18,6 +18,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 [![Travis build status](https://travis-ci.org/bayesstuff/stanova.svg?branch=master)](https://travis-ci.org/bayesstuff/stanova)
 [![R build status](https://github.com/bayesstuff/stanova/workflows/R-CMD-check/badge.svg)](https://github.com/bayesstuff/stanova/actions)
+[![DOI](https://zenodo.org/badge/241858315.svg)](https://zenodo.org/badge/latestdoi/241858315)
 <!-- badges: end -->
 
 The goal of `stanova` is to provide a more relevant and interpretable `summary` for Bayesian models with categorical covariates and possibly interactions and continuous covariates estimated in `Stan`. The core functions are `stanova()`  which requires specifying which `rstanarm` function should be called through argument `model_fun` (e.g., `model_fun = glmer` calls `stan_glmer` and allows fitting Bayesian mixed models) and `stanova_brm()` which estimates models using `brms::brm()`.

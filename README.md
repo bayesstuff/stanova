@@ -9,26 +9,27 @@
 status](https://travis-ci.org/bayesstuff/stanova.svg?branch=master)](https://travis-ci.org/bayesstuff/stanova)
 [![R build
 status](https://github.com/bayesstuff/stanova/workflows/R-CMD-check/badge.svg)](https://github.com/bayesstuff/stanova/actions)
+[![DOI](https://zenodo.org/badge/241858315.svg)](https://zenodo.org/badge/latestdoi/241858315)
 <!-- badges: end -->
 
 The goal of `stanova` is to provide a more relevant and interpretable
 `summary` for Bayesian models with categorical covariates and possibly
 interactions and continuous covariates estimated in `Stan`. The core
 functions are `stanova()` which requires specifying which `rstanarm`
-function should be called through argument `model_fun` (e.g., `model_fun
-= glmer` calls `stan_glmer` and allows fitting Bayesian mixed models)
-and `stanova_brm()` which estimates models using `brms::brm()`.
+function should be called through argument `model_fun` (e.g.,
+`model_fun = glmer` calls `stan_glmer` and allows fitting Bayesian mixed
+models) and `stanova_brm()` which estimates models using `brms::brm()`.
 
 The issue `stanova` tries to address is that categorical variables with
-\(k\) levels need to be transformed into \(k-1\) numerical model
+*k* levels need to be transformed into *k* − 1 numerical model
 coefficients. This poses a problem if a model includes a factor with
 more than two levels that interacts with another variable. In this case,
 the most reasonable parameterization of the model is such that the
 intercept correspond to the (unweighted) grand mean and therefore
 estimates of the coefficients for the main effects represent average
 effects (compared to simple effects). In this parameterization, factors
-with \(k\) levels, where \(k > 2\) (i.e., more than two levels), cannot
-be mapped in a 1-to-1 fashion to the \(k-1\) coefficients as no such
+with *k* levels, where *k* &gt; 2 (i.e., more than two levels), cannot
+be mapped in a 1-to-1 fashion to the *k* − 1 coefficients as no such
 mapping exists. Thus, the estimates of the model coefficients do not
 represent effects of one factor level, but always pertain to more than
 one factor level and thus cannot be directly interpreted. In other
@@ -49,7 +50,7 @@ marginal prior differs across factor levels. For example, when using
 model coefficient with positive sign, and the last factor level is
 mapped with negative sign on all model coefficients. Thus, the marginal
 prior for the last factor level is more diffuse than for the other
-factor levels (if \(k >2\)). `stanova` per default uses the contrast
+factor levels (if *k* &gt; 2). `stanova` per default uses the contrast
 coding scheme suggested by Rouder, Morey, Speckman, and Province (2012)
 which is such that the marginal prior is the same for all factor levels.
 When using this contrast, the sum-to-zero constraint that is necessary
@@ -130,14 +131,14 @@ summary(m_machines)
 #> 
 #> Estimate Intercept:
 #>      Variable   Mean MAD_SD     5%    50%    95%  rhat ess_bulk ess_tail
-#> 1 (Intercept) 59.822  1.741 56.774 59.815 62.846 1.007  301.177  419.510
+#> 1 (Intercept) 59.544  1.858 56.203 59.551 63.131 1.007  309.309  356.113
 #> 
 #> 
 #> Estimates 'Machine' - difference from intercept:
 #>    Variable   Mean MAD_SD     5%    50%    95%  rhat ess_bulk ess_tail
-#> 1 Machine A -7.232  1.252 -9.484 -7.184 -5.024 1.006  360.512  490.292
-#> 2 Machine B  0.628  1.330 -1.598  0.587  3.000 1.011  392.514  523.328
-#> 3 Machine C  6.603  1.091  4.467  6.608  8.563 1.005  347.099  342.109
+#> 1 Machine A -7.202  1.279 -9.609 -7.132 -5.012 1.006  394.708  467.065
+#> 2 Machine B  0.663  1.311 -1.548  0.656  2.953 1.001  268.390  378.224
+#> 3 Machine C  6.540  1.148  4.578  6.497  8.753 1.004  296.233  306.291
 ```
 
 If one is not interested in the differences from the factor levels, it
@@ -160,14 +161,14 @@ summary(m_machines, diff_intercept = FALSE)
 #> 
 #> Estimate Intercept:
 #>      Variable   Mean MAD_SD     5%    50%    95%  rhat ess_bulk ess_tail
-#> 1 (Intercept) 59.822  1.741 56.774 59.815 62.846 1.007  301.177  419.510
+#> 1 (Intercept) 59.544  1.858 56.203 59.551 63.131 1.007  309.309  356.113
 #> 
 #> 
 #> Estimates 'Machine' - marginal means:
 #>    Variable   Mean MAD_SD     5%    50%    95%  rhat ess_bulk ess_tail
-#> 1 Machine A 52.591  1.679 49.584 52.620 55.915 1.002  369.999  373.980
-#> 2 Machine B 60.451  2.613 55.720 60.500 65.445 1.011  302.915  452.468
-#> 3 Machine C 66.426  1.877 63.311 66.352 69.710 1.004  321.080  409.438
+#> 1 Machine A 52.341  1.840 48.928 52.329 55.596 1.007  391.147  493.278
+#> 2 Machine B 60.207  2.795 55.185 60.134 65.504 1.005  248.027  381.530
+#> 3 Machine C 66.084  1.930 62.594 66.124 69.304 1.006  303.862  411.347
 ```
 
 The key to the output is the `stanova_samples()` function which takes a
@@ -181,12 +182,12 @@ the `return` argument.
 out_array <- stanova_samples(m_machines)
 str(out_array)
 #> List of 2
-#>  $ (Intercept): num [1:500, 1, 1:2] 60.5 60 60.8 59.8 60 ...
+#>  $ (Intercept): num [1:500, 1, 1:2] 59.4 60.3 61.2 55.6 55.8 ...
 #>   ..- attr(*, "dimnames")=List of 3
 #>   .. ..$ Iteration: chr [1:500] "1" "2" "3" "4" ...
 #>   .. ..$ Parameter: chr "(Intercept)"
 #>   .. ..$ Chain    : chr [1:2] "1" "2"
-#>  $ Machine    : num [1:500, 1:3, 1:2] -5.36 -7.86 -7.27 -7.66 -7.74 ...
+#>  $ Machine    : num [1:500, 1:3, 1:2] -7.84 -8.01 -8.92 -5.95 -6.91 ...
 #>   ..- attr(*, "dimnames")=List of 3
 #>   .. ..$ Iteration: chr [1:500] "1" "2" "3" "4" ...
 #>   .. ..$ Parameter: chr [1:3] "Machine A" "Machine B" "Machine C"
@@ -201,12 +202,12 @@ via the `dimension_chain` argument.
 out_array2 <- stanova_samples(m_machines, dimension_chain = 2)
 str(out_array2)
 #> List of 2
-#>  $ (Intercept): num [1:500, 1:2, 1] 60.5 60 60.8 59.8 60 ...
+#>  $ (Intercept): num [1:500, 1:2, 1] 59.4 60.3 61.2 55.6 55.8 ...
 #>   ..- attr(*, "dimnames")=List of 3
 #>   .. ..$ Iteration: chr [1:500] "1" "2" "3" "4" ...
 #>   .. ..$ Chain    : chr [1:2] "1" "2"
 #>   .. ..$ Parameter: chr "(Intercept)"
-#>  $ Machine    : num [1:500, 1:2, 1:3] -5.36 -7.86 -7.27 -7.66 -7.74 ...
+#>  $ Machine    : num [1:500, 1:2, 1:3] -7.84 -8.01 -8.92 -5.95 -6.91 ...
 #>   ..- attr(*, "dimnames")=List of 3
 #>   .. ..$ Iteration: chr [1:500] "1" "2" "3" "4" ...
 #>   .. ..$ Chain    : chr [1:2] "1" "2"
@@ -241,7 +242,7 @@ from the intercept.
 
 ``` r
 summary(m_machines_brm)
-#> Warning: There were 2 divergent transitions after warmup. Increasing adapt_delta
+#> Warning: There were 1 divergent transitions after warmup. Increasing adapt_delta
 #> above 0.8 may help. See http://mc-stan.org/misc/warnings.html#divergent-
 #> transitions-after-warmup
 #> 
@@ -258,22 +259,22 @@ summary(m_machines_brm)
 #> 
 #> Estimate Intercept:
 #>      Variable   Mean MAD_SD     5%    50%    95%  rhat ess_bulk ess_tail
-#> 1 (Intercept) 59.915  2.169 56.284 59.900 64.193 1.004  430.852  379.244
+#> 1 (Intercept) 59.624  2.088 55.659 59.651 63.545 1.002  382.992  394.201
 #> 
 #> 
 #> Estimates 'Machine' - difference from intercept:
 #>    Variable   Mean MAD_SD     5%    50%    95%  rhat ess_bulk ess_tail
-#> 1 Machine A -7.394  1.223 -9.866 -7.338 -4.881 1.002  585.078  520.365
-#> 2 Machine B  0.771  1.575 -2.195  0.797  3.642 1.006  478.505  557.933
-#> 3 Machine C  6.623  1.413  3.951  6.579  9.436 1.004  621.441  634.558
+#> 1 Machine A -7.299  1.287 -9.633 -7.279 -4.741 1.002  579.371  734.007
+#> 2 Machine B  0.667  1.493 -2.235  0.622  3.686 0.999  497.840  465.746
+#> 3 Machine C  6.631  1.499  3.823  6.654  9.423 1.000  528.319  672.698
 ```
 
-And we can get the estimated marginal means using `diff_intercept =
-FALSE`.
+And we can get the estimated marginal means using
+`diff_intercept = FALSE`.
 
 ``` r
 summary(m_machines_brm, diff_intercept = FALSE)
-#> Warning: There were 2 divergent transitions after warmup. Increasing adapt_delta
+#> Warning: There were 1 divergent transitions after warmup. Increasing adapt_delta
 #> above 0.8 may help. See http://mc-stan.org/misc/warnings.html#divergent-
 #> transitions-after-warmup
 #> 
@@ -290,14 +291,14 @@ summary(m_machines_brm, diff_intercept = FALSE)
 #> 
 #> Estimate Intercept:
 #>      Variable   Mean MAD_SD     5%    50%    95%  rhat ess_bulk ess_tail
-#> 1 (Intercept) 59.915  2.169 56.284 59.900 64.193 1.004  430.852  379.244
+#> 1 (Intercept) 59.624  2.088 55.659 59.651 63.545 1.002  382.992  394.201
 #> 
 #> 
 #> Estimates 'Machine' - marginal means:
 #>    Variable   Mean MAD_SD     5%    50%    95%  rhat ess_bulk ess_tail
-#> 1 Machine A 52.521  2.207 48.114 52.549 56.595 1.003  496.900  395.046
-#> 2 Machine B 60.686  3.208 54.787 60.851 66.645 1.007  431.779  514.153
-#> 3 Machine C 66.538  2.417 62.450 66.501 71.325 1.007  459.667  440.038
+#> 1 Machine A 52.325  2.198 48.244 52.380 56.185 0.999  347.682  501.531
+#> 2 Machine B 60.291  3.225 54.467 60.299 66.182 1.001  401.992  430.714
+#> 3 Machine C 66.255  2.461 62.197 66.093 70.772 1.003  530.649  685.704
 ```
 
 # References
